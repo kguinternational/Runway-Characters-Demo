@@ -1,0 +1,53 @@
+{
+  "name": "northstar-runway-characters-demo",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.15.1",
+  "scripts": {
+    "demo": "convex dev --once --run seed:seedDemo && convex dev --start \"pnpm run dev\"",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "convex:dev": "convex dev",
+    "convex:seed": "convex run seed:seedDemo"
+  },
+  "dependencies": {
+    "@runwayml/avatars-node-rpc": "^0.1.0",
+    "@runwayml/avatars-react": "^0.17.0",
+    "@runwayml/sdk": "^4.10.0",
+    "@tailwindcss/postcss": "^4.3.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "convex": "^1.42.1",
+    "lucide-react": "^0.468.0",
+    "next": "15.5.20",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^3.9.2",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^4.3.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.3",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "15.5.20",
+    "jsdom": "^28.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
