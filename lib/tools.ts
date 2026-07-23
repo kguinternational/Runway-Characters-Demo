@@ -1,54 +1,24 @@
-import {
-  clientTool,
-  pageActionTools,
-  type ClientEventsFrom,
-} from "@runwayml/avatars-react/api";
+import { clientTool, pageActionTools } from "@runwayml/avatars-react/api";
 import type { RealtimeSessionCreateParams } from "@runwayml/sdk/resources/realtime-sessions";
 import { z } from "zod";
 
-import type { RevenueRange } from "@/lib/convex-functions";
-
 type SessionTools = NonNullable<RealtimeSessionCreateParams["tools"]>;
-
-// The published 0.17 declaration widens Page Action parameter `type` values
-// to `string`, even though the runtime objects use the API's string/number
-// literals. Narrow the verified SDK-owned definitions at this boundary.
-const typedPageActionTools = pageActionTools as unknown as SessionTools;
-
-export const revenueRangeSchema = z.enum(["7d", "30d", "90d"]);
 
 export const setDateRangeTool = clientTool("set_date_range", {
   description:
-    "Change the revenue chart to the requested trailing date range. When the user says the chart looks off, first scroll to and highlight revenue-chart, then set 30d here, then call get_revenue with 30d.",
-  schema: z.object({ range: revenueRangeSchema }).strict(),
+    "Show a revenue date range. Navigate to Revenue first, then change the visible chart.",
+  schema: z.object({ range: z.enum(["7d", "30d", "90d"]) }),
 });
 
 export const openPanelTool = clientTool("open_panel", {
-  description:
-    "Open the dashboard's right-hand information panel with a concise title and body. Use it only after the underlying action succeeds; a ticket confirmation must include the exact ticketId returned by create_ticket.",
-  schema: z
-    .object({
-      title: z.string().trim().min(1).max(80),
-      body: z.string().trim().min(1).max(320),
-    })
-    .strict(),
+  description: "Open the same information panel the user can open by clicking the dashboard.",
+  schema: z.object({
+    title: z.string(),
+    body: z.string(),
+  }),
 });
 
-/**
- * Keep this tuple separate from the API-facing tools. The schemas above power
- * browser-side inference and validation; Runway still needs the explicit
- * `parameters` arrays below so the model knows how to construct arguments.
- */
-export const clientToolDefinitions = [
-  setDateRangeTool,
-  openPanelTool,
-] as const;
-
-export type NovaClientEvents = ClientEventsFrom<
-  typeof clientToolDefinitions
->;
-
-export const clientEventTools = [
+const clientTools = [
   {
     ...setDateRangeTool,
     parameters: [
@@ -57,50 +27,25 @@ export const clientEventTools = [
         type: "string",
         enum: ["7d", "30d", "90d"],
         required: true,
-        description: "Trailing revenue range to display: 7d, 30d, or 90d.",
+        description: "The visible range: 7d, 30d, or 90d.",
       },
     ],
   },
   {
     ...openPanelTool,
     parameters: [
-      {
-        name: "title",
-        type: "string",
-        required: true,
-        description: "Short panel heading, no more than 80 characters.",
-      },
-      {
-        name: "body",
-        type: "string",
-        required: true,
-        description:
-          "Concise confirmation or explanatory text, no more than 320 characters.",
-      },
+      { name: "title", type: "string", required: true, description: "Short panel title." },
+      { name: "body", type: "string", required: true, description: "Short panel message." },
     ],
   },
 ] satisfies SessionTools;
 
-export const getRevenueArgsSchema = z
-  .object({ range: revenueRangeSchema })
-  .strict();
-
-export const createTicketArgsSchema = z
-  .object({
-    subject: z.string().trim().min(1).max(180),
-    team: z.string().trim().min(1).max(60),
-  })
-  .strict();
-
-export type GetRevenueArgs = z.infer<typeof getRevenueArgsSchema>;
-export type CreateTicketArgs = z.infer<typeof createTicketArgsSchema>;
-
-export const backendRpcTools = [
+const serverTools = [
   {
     type: "backend_rpc",
     name: "get_revenue",
     description:
-      "Read revenue analytics from the live database for a trailing range. Call this whenever the user asks for a revenue total, change, anomaly, dip, or refund explanation; never estimate those values from the chart.",
+      "Read the live revenue total, change, and refund dip from Convex. Use this for any revenue question instead of estimating from the chart.",
     timeoutSeconds: 8,
     parameters: [
       {
@@ -108,7 +53,7 @@ export const backendRpcTools = [
         type: "string",
         enum: ["7d", "30d", "90d"],
         required: true,
-        description: "Trailing database range to analyze: 7d, 30d, or 90d.",
+        description: "The database range: 7d, 30d, or 90d.",
       },
     ],
   },
@@ -116,33 +61,24 @@ export const backendRpcTools = [
     type: "backend_rpc",
     name: "create_ticket",
     description:
-      "Create a real support ticket in the database and return its numeric ticket ID. Use only after the user asks to log, file, or create a ticket, then speak the returned ID and call open_panel with that exact ID.",
+      "Create a real support ticket in Convex when the user asks. Return and speak the ticket ID, then open a confirmation panel.",
     timeoutSeconds: 8,
     parameters: [
-      {
-        name: "subject",
-        type: "string",
-        required: true,
-        description:
-          "Specific action-oriented ticket subject, no more than 180 characters.",
-      },
+      { name: "subject", type: "string", required: true, description: "Ticket subject." },
       {
         name: "team",
         type: "string",
+        enum: ["Billing", "Support", "Product"],
         required: true,
-        description:
-          "Owning team name. Use Billing for the refund investigation in this demo.",
+        description: "Owning team.",
       },
     ],
   },
 ] satisfies SessionTools;
 
-export const novaSessionTools: SessionTools = [
-  ...typedPageActionTools,
-  ...clientEventTools,
-  ...backendRpcTools,
+// The SDK owns the Page Action definitions; this cast only bridges a declaration mismatch.
+export const sessionTools: SessionTools = [
+  ...(pageActionTools as unknown as SessionTools),
+  ...clientTools,
+  ...serverTools,
 ];
-
-export function isRevenueRange(value: string): value is RevenueRange {
-  return revenueRangeSchema.safeParse(value).success;
-}

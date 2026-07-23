@@ -3,7 +3,7 @@ import { Bricolage_Grotesque, IBM_Plex_Mono } from "next/font/google";
 import "@runwayml/avatars-react/styles.css";
 import "./globals.css";
 
-import { Providers } from "@/components/providers";
+import { Providers } from "@/components/layout/providers";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],

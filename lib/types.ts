@@ -28,19 +28,7 @@ export interface TicketRecord {
   createdAt: number;
 }
 
-export interface TicketListResult {
-  tickets: TicketRecord[];
-  openCount: number;
-}
-
 export interface InfoPanelState {
   title: string;
   body: string;
-}
-
-export interface RpcEvent {
-  type: "connected" | "tool" | "error" | "closed";
-  tool?: "get_revenue" | "create_ticket";
-  result?: Record<string, unknown>;
-  message?: string;
 }

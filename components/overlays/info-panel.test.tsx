@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { InfoPanel } from "@/components/info-panel";
+import { InfoPanel } from "@/components/overlays/info-panel";
 
 describe("InfoPanel", () => {
   it("shows the exact confirmation supplied by Nova's client tool", () => {

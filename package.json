@@ -5,6 +5,7 @@
   "packageManager": "pnpm@11.15.1",
   "scripts": {
     "demo": "convex dev --once --run seed:seedDemo && convex dev --start \"pnpm run dev\"",
+    "dev:all": "convex dev --once --run seed:seedDemo && convex dev --start \"pnpm run dev\"",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

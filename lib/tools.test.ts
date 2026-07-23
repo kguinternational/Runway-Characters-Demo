@@ -2,17 +2,15 @@ import { validateClientToolArgs } from "@runwayml/avatars-react/api";
 import { describe, expect, it } from "vitest";
 
 import {
-  backendRpcTools,
-  clientEventTools,
-  novaSessionTools,
   openPanelTool,
+  sessionTools,
   setDateRangeTool,
 } from "@/lib/tools";
 
 describe("Nova tool contract", () => {
   it("includes all three Page Actions with model-facing targets", () => {
     for (const name of ["click", "scroll_to", "highlight"]) {
-      const tool = novaSessionTools.find((candidate) => candidate.name === name);
+      const tool = sessionTools.find((candidate) => candidate.name === name);
       expect(tool).toMatchObject({ type: "client_event", name });
       expect(tool?.parameters?.some((parameter) => parameter.name === "target")).toBe(
         true,
@@ -35,8 +33,8 @@ describe("Nova tool contract", () => {
       body: "Billing owns the refund investigation.",
     });
 
-    expect(clientEventTools).toHaveLength(2);
-    expect(clientEventTools[0]?.parameters?.[0]).toMatchObject({
+    const rangeTool = sessionTools.find((tool) => tool.name === "set_date_range");
+    expect(rangeTool?.parameters?.[0]).toMatchObject({
       name: "range",
       enum: ["7d", "30d", "90d"],
       required: true,
@@ -44,7 +42,7 @@ describe("Nova tool contract", () => {
   });
 
   it("declares database-backed RPC tools with bounded timeouts", () => {
-    expect(backendRpcTools).toEqual(
+    expect(sessionTools).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           type: "backend_rpc",

@@ -1,0 +1,112 @@
+"use client";
+
+import { ArrowDownToLine, GitCompareArrows, ReceiptText } from "lucide-react";
+import { useQuery } from "convex/react";
+
+import { useDashboard } from "@/components/layout/dashboard-provider";
+import { PageHeader } from "@/components/layout/page-header";
+import { RevenueChart } from "@/components/revenue/revenue-chart";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { getRevenueRef } from "@/lib/convex-functions";
+import type { RevenueResult } from "@/lib/types";
+import { formatCurrency, formatShortDate } from "@/lib/utils";
+
+export function RevenuePage() {
+  const { range, setRange, openPanel } = useDashboard();
+  const revenue = useQuery(getRevenueRef, { range }) as RevenueResult | undefined;
+
+  function exportCsv() {
+    if (!revenue) return;
+    const rows = ["date,amount,refunded", ...revenue.series.map((row) =>
+      `${row.date},${row.amount},${Boolean(row.refunded)}`,
+    )];
+    const url = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `northstar-revenue-${range}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div id="revenue-page" data-avatar-target="revenue-page">
+      <PageHeader
+        eyebrow="Revenue intelligence"
+        title="Find what changed."
+        description="Change the range, inspect the refund, or export the same live rows Nova reads."
+      />
+
+      <section
+        id="revenue-summary"
+        data-avatar-target="revenue-summary"
+        className="mb-5 grid gap-3 sm:grid-cols-3"
+      >
+        <Card className="p-5">
+          <p className="font-mono text-[0.63rem] uppercase tracking-[0.16em] text-[var(--muted)]">
+            Selected total
+          </p>
+          <p className="mt-3 text-2xl font-semibold">
+            {revenue ? formatCurrency(revenue.total) : "Loading…"}
+          </p>
+        </Card>
+        <button
+          id="revenue-compare"
+          data-avatar-target="revenue-compare"
+          className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--surface)] p-5 text-left transition hover:border-[var(--line-strong)]"
+          onClick={() =>
+            openPanel({
+              title: "Period comparison",
+              body: revenue
+                ? `${range} revenue is ${revenue.changePct}% versus the previous comparable period.`
+                : "Revenue is loading.",
+            })
+          }
+        >
+          <GitCompareArrows className="size-4 text-[var(--muted)]" />
+          <p className="mt-3 text-sm font-semibold">Compare periods</p>
+        </button>
+        <button
+          id="revenue-export"
+          data-avatar-target="revenue-export"
+          className="rounded-[1.4rem] border border-[var(--line)] bg-[var(--surface)] p-5 text-left transition hover:border-[var(--line-strong)]"
+          onClick={exportCsv}
+        >
+          <ArrowDownToLine className="size-4 text-[var(--muted)]" />
+          <p className="mt-3 text-sm font-semibold">Export visible rows</p>
+        </button>
+      </section>
+
+      <RevenueChart
+        range={range}
+        onRangeChange={setRange}
+        data={revenue}
+        onOpenAnomaly={() =>
+          openPanel({
+            title: "Refund anomaly",
+            body: revenue?.dip
+              ? `${formatCurrency(revenue.dip.amount)} was marked as a refund on ${formatShortDate(revenue.dip.date)}.`
+              : "No refund anomaly is visible in this range.",
+          })
+        }
+      />
+
+      <div className="mt-5 flex justify-end">
+        <Button
+          id="revenue-explain"
+          data-avatar-target="revenue-explain"
+          variant="outline"
+          onClick={() =>
+            openPanel({
+              title: "How this is calculated",
+              body: "The total sums settled daily rows from Convex. Negative refund rows remain visible.",
+            })
+          }
+        >
+          <ReceiptText className="size-4" />
+          Calculation details
+        </Button>
+      </div>
+    </div>
+  );
+}
