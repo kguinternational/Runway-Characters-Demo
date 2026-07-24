@@ -163,7 +163,8 @@ a {
   animation: live-pulse 1.8s ease-out infinite;
 }
 
-[data-avatar-highlighted] {
+[data-avatar-highlighted],
+[data-avatar-target]:target {
   position: relative;
   z-index: 2;
   outline: 3px solid var(--accent) !important;

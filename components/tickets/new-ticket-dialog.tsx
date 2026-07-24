@@ -53,6 +53,8 @@ export function NewTicketDialog({
             <h2 className="mt-2 text-2xl font-semibold">Create a ticket</h2>
           </div>
           <Button
+            id="close-new-ticket"
+            data-avatar-target="close-new-ticket"
             type="button"
             variant="ghost"
             size="icon"

@@ -110,6 +110,8 @@ export function OverviewPage() {
               <h2 className="mt-2 text-xl font-semibold">Latest tickets</h2>
             </div>
             <Link
+              id="overview-view-tickets"
+              data-avatar-target="overview-view-tickets"
               href="/tickets"
               className="rounded-full border border-[var(--line)] px-4 py-2 text-xs font-semibold"
             >
@@ -150,30 +152,42 @@ export function OverviewPage() {
           className="p-5 sm:p-6"
         >
           <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--muted)]">
-            Clickable actions
+            Nova capability map
           </p>
-          <h2 className="mt-2 text-xl font-semibold">Go straight to the work.</h2>
+          <h2 className="mt-2 text-xl font-semibold">
+            Every function is clickable.
+          </h2>
           <div className="mt-5 grid gap-2">
             <Link
               id="overview-open-revenue"
               data-avatar-target="overview-open-revenue"
-              href="/revenue"
-              className="rounded-xl bg-[var(--ink)] px-4 py-3 text-sm font-semibold text-[var(--paper)]"
+              href="/revenue#revenue-chart"
+              className="rounded-xl bg-[var(--ink)] px-4 py-3 text-[var(--paper)]"
             >
-              Investigate revenue
+              <span className="block text-sm font-semibold">
+                Read revenue + change range
+              </span>
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] opacity-55">
+                get_revenue · set_date_range
+              </span>
             </Link>
             <Link
               id="overview-open-tickets"
               data-avatar-target="overview-open-tickets"
-              href="/tickets"
-              className="rounded-xl border border-[var(--line)] px-4 py-3 text-sm font-semibold"
+              href="/tickets#tickets-actions"
+              className="rounded-xl border border-[var(--line)] px-4 py-3"
             >
-              Open support queue
+              <span className="block text-sm font-semibold">
+                Create a real support ticket
+              </span>
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
+                create_ticket
+              </span>
             </Link>
             <button
-              id="overview-alerts"
-              data-avatar-target="overview-alerts"
-              className="rounded-xl border border-[var(--line)] px-4 py-3 text-left text-sm font-semibold"
+              id="overview-open-panel"
+              data-avatar-target="overview-open-panel"
+              className="rounded-xl border border-[var(--line)] px-4 py-3 text-left"
               onClick={() =>
                 openPanel({
                   title: "One anomaly found",
@@ -181,7 +195,46 @@ export function OverviewPage() {
                 })
               }
             >
-              Review alerts
+              <span className="block text-sm font-semibold">
+                Open a dashboard detail
+              </span>
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
+                open_panel
+              </span>
+            </button>
+            <a
+              id="overview-page-actions"
+              data-avatar-target="overview-page-actions"
+              href="#overview-activity"
+              className="rounded-xl border border-[var(--line)] px-4 py-3"
+            >
+              <span className="block text-sm font-semibold">
+                Preview page actions
+              </span>
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
+                click · scroll_to · highlight
+              </span>
+            </a>
+            <button
+              id="overview-insight"
+              data-avatar-target="overview-insight"
+              className="rounded-xl border border-[var(--line)] px-4 py-3 text-left"
+              onClick={() =>
+                openPanel({
+                  title: "Overview insight",
+                  body:
+                    revenue && openCount !== undefined
+                      ? `${formatCurrency(revenue.total)} in 30-day revenue and ${openCount} open tickets. Open Revenue for the refund detail.`
+                      : "The live overview data is still loading.",
+                })
+              }
+            >
+              <span className="block text-sm font-semibold">
+                Get this page’s insight
+              </span>
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
+                Available by click or conversation
+              </span>
             </button>
           </div>
         </Card>

@@ -15,6 +15,13 @@ const pageNames: Record<string, string> = {
   "/settings": "Settings",
 };
 
+const mobileTargets: Record<string, string> = {
+  "/": "overview",
+  "/revenue": "revenue",
+  "/tickets": "tickets",
+  "/settings": "settings",
+};
+
 export function TopBar() {
   const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
@@ -71,6 +78,8 @@ export function TopBar() {
           <Link
             key={href}
             href={href}
+            id={`mobile-${mobileTargets[href]}`}
+            data-avatar-target={`mobile-${mobileTargets[href]}`}
             className="rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:bg-[var(--surface-raised)]"
           >
             {label}

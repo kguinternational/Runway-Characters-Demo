@@ -16,6 +16,8 @@ export function InfoPanel({
   return (
     <>
       <button
+        id="close-info-panel-backdrop"
+        data-avatar-target="close-info-panel-backdrop"
         aria-label="Close information panel"
         tabIndex={panel ? 0 : -1}
         onClick={onClose}
@@ -38,6 +40,8 @@ export function InfoPanel({
             Dashboard detail
           </span>
           <Button
+            id="close-info-panel"
+            data-avatar-target="close-info-panel"
             variant="ghost"
             size="icon"
             className="text-[#aab3ae] hover:bg-white/10 hover:text-white"

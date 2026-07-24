@@ -81,8 +81,19 @@ export function AgentCard() {
               </h2>
             </div>
           </div>
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-3.5">
+            <p className="font-mono text-[0.58rem] uppercase tracking-[0.14em] text-white/38">
+              What Nova can do
+            </p>
+            <p className="mt-2 text-xs leading-5 text-white/62">
+              Navigate, click, scroll, highlight, explain pages, change revenue
+              ranges, read live revenue, open details, and create tickets.
+            </p>
+          </div>
           <div className="mt-5 grid gap-2">
             <Button
+              id="start-screen-call"
+              data-avatar-target="start-screen-call"
               variant="accent"
               className="w-full"
               onClick={startWithScreenShare}
@@ -91,6 +102,8 @@ export function AgentCard() {
               Share screen & call
             </Button>
             <Button
+              id="start-voice-call"
+              data-avatar-target="start-voice-call"
               variant="ghost"
               className="w-full border border-white/10 text-white/65 hover:bg-white/10 hover:text-white"
               onClick={() => setStarted(true)}
@@ -99,6 +112,9 @@ export function AgentCard() {
               Voice only
             </Button>
           </div>
+          <p className="mt-3 text-center font-mono text-[0.55rem] uppercase tracking-[0.11em] text-white/30">
+            In call · mute · share or stop screen · end call
+          </p>
         </div>
       )}
     </aside>
