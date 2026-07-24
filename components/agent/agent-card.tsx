@@ -3,32 +3,70 @@
 import {
   AvatarCall,
   AvatarVideo,
-  ControlBar,
   ScreenShareVideo,
+  type SessionCredentials,
 } from "@runwayml/avatars-react";
 import { Headphones, MonitorUp } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 import { createAvatarSession } from "@/actions/avatar";
+import { CallControls } from "@/components/agent/call-controls";
 import { ClientToolHandlers } from "@/components/agent/client-tool-handlers";
 import { Button } from "@/components/ui/button";
 import { NOVA_AVATAR_ID, NOVA_IMAGE } from "@/lib/avatar";
 
 export function AgentCard() {
-  const [started, setStarted] = useState(false);
+  const [credentials, setCredentials] =
+    useState<SessionCredentials | null>(null);
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+
+  async function startCall(stream?: MediaStream) {
+    setError(null);
+    setStarting(true);
+    try {
+      const freshCredentials = await createAvatarSession();
+      setScreenStream(stream ?? null);
+      setCredentials(freshCredentials);
+    } catch (callError) {
+      console.error(callError);
+      stream?.getTracks().forEach((track) => track.stop());
+      setError(
+        "The call could not start. Check the local Runway setup and try again.",
+      );
+    } finally {
+      setStarting(false);
+    }
+  }
 
   async function startWithScreenShare() {
-    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-    setScreenStream(stream);
-    setStarted(true);
+    setError(null);
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+      });
+      await startCall(stream);
+    } catch {
+      setError(
+        "Screen sharing was cancelled or blocked. Try again and choose this tab.",
+      );
+    }
   }
 
   function endCall() {
     screenStream?.getTracks().forEach((track) => track.stop());
     setScreenStream(null);
-    setStarted(false);
+    setCredentials(null);
+  }
+
+  function handleCallError(callError: Error) {
+    console.error(callError);
+    setError(
+      "The call could not start. Check the local Runway setup and try again.",
+    );
+    endCall();
   }
 
   return (
@@ -46,20 +84,20 @@ export function AgentCard() {
         </span>
       </div>
 
-      {started ? (
+      {credentials ? (
         <AvatarCall
           avatarId={NOVA_AVATAR_ID}
-          connect={createAvatarSession}
+          credentials={credentials}
           initialScreenStream={screenStream ?? undefined}
           video={false}
           className="h-[405px] rounded-none"
           onEnd={endCall}
-          onError={console.error}
+          onError={handleCallError}
         >
           <AvatarVideo />
           <ScreenShareVideo />
           <ClientToolHandlers />
-          <ControlBar showCamera={false} showScreenShare />
+          <CallControls />
         </AvatarCall>
       ) : (
         <div className="p-5">
@@ -96,22 +134,29 @@ export function AgentCard() {
               data-avatar-target="start-screen-call"
               variant="accent"
               className="w-full"
+              disabled={starting}
               onClick={startWithScreenShare}
             >
               <MonitorUp className="size-4" />
-              Share screen & call
+              {starting ? "Starting call…" : "Share screen & call"}
             </Button>
             <Button
               id="start-voice-call"
               data-avatar-target="start-voice-call"
               variant="ghost"
               className="w-full border border-white/10 text-white/65 hover:bg-white/10 hover:text-white"
-              onClick={() => setStarted(true)}
+              disabled={starting}
+              onClick={() => startCall()}
             >
               <Headphones className="size-4" />
-              Voice only
+              {starting ? "Starting call…" : "Voice only"}
             </Button>
           </div>
+          {error ? (
+            <p role="alert" className="mt-3 text-center text-xs text-[#ff9b90]">
+              {error}
+            </p>
+          ) : null}
           <p className="mt-3 text-center font-mono text-[0.55rem] uppercase tracking-[0.11em] text-white/30">
             In call · mute · share or stop screen · end call
           </p>

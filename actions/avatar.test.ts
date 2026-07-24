@@ -38,7 +38,11 @@ vi.mock("convex/browser", () => ({
 }));
 
 import { createAvatarSession } from "@/actions/avatar";
-import { NOVA_PERSONALITY, NOVA_START_SCRIPT } from "@/lib/avatar";
+import {
+  NOVA_AVATAR_ID,
+  NOVA_PERSONALITY,
+  NOVA_START_SCRIPT,
+} from "@/lib/avatar";
 
 type RpcOptions = {
   sessionId: string;
@@ -83,7 +87,7 @@ describe("createAvatarSession", () => {
     });
     mocks.mutation.mockResolvedValue(4_806);
 
-    await expect(createAvatarSession("nova-avatar")).resolves.toEqual({
+    await expect(createAvatarSession()).resolves.toEqual({
       sessionId: "session-123",
       serverUrl: "wss://runway.example",
       token: "livekit-token",
@@ -92,11 +96,19 @@ describe("createAvatarSession", () => {
     expect(mocks.create).toHaveBeenCalledWith(
       expect.objectContaining({
         model: "gwm1_avatars",
-        avatar: { type: "custom", avatarId: "nova-avatar" },
+        avatar: { type: "custom", avatarId: NOVA_AVATAR_ID },
         maxDuration: 300,
-        personality: NOVA_PERSONALITY,
+        personality: expect.stringContaining(
+          "Speak one short acknowledgement aloud first",
+        ),
         startScript: NOVA_START_SCRIPT,
       }),
+    );
+    expect(NOVA_PERSONALITY).toContain(
+      "For navigation or clicks, call highlight, then call click with the same target.",
+    );
+    expect(NOVA_PERSONALITY).toContain(
+      "scroll_to and highlight revenue-chart",
     );
     expect(mocks.pollUntilReady).toHaveBeenCalledWith({
       sessionId: "session-123",
@@ -117,6 +129,15 @@ describe("createAvatarSession", () => {
         team: "Billing",
       }),
     ).resolves.toEqual({ ticketId: 4_806 });
+    await expect(
+      rpcOptions!.tools.get_revenue({ range: "31d" }),
+    ).rejects.toThrow();
+    await expect(
+      rpcOptions!.tools.create_ticket({
+        subject: "Investigate refund",
+        team: "Finance",
+      }),
+    ).rejects.toThrow();
     expect(mocks.query).toHaveBeenCalledWith(expect.anything(), { range: "30d" });
     expect(mocks.mutation).toHaveBeenCalledWith(expect.anything(), {
       subject: "Investigate refund",

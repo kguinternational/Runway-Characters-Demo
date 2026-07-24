@@ -4,15 +4,28 @@ import { createRpcHandler, type RpcHandler } from "@runwayml/avatars-node-rpc";
 import Runway from "@runwayml/sdk";
 import { consumeSession, pollUntilReady } from "@runwayml/avatars-react/api";
 import { ConvexHttpClient } from "convex/browser";
+import { z } from "zod";
 
-import { NOVA_PERSONALITY, NOVA_START_SCRIPT } from "@/lib/avatar";
+import {
+  NOVA_AVATAR_ID,
+  NOVA_PERSONALITY,
+  NOVA_START_SCRIPT,
+} from "@/lib/avatar";
 import { createTicketRef, getRevenueRef } from "@/lib/convex-functions";
 import { sessionTools } from "@/lib/tools";
-import type { RevenueRange } from "@/lib/types";
 
 const handlers = new Map<string, RpcHandler>();
 
-export async function createAvatarSession(avatarId: string) {
+const revenueArgs = z.object({
+  range: z.enum(["7d", "30d", "90d"]),
+});
+
+const ticketArgs = z.object({
+  subject: z.string().trim().min(1).max(180),
+  team: z.enum(["Billing", "Support", "Product"]),
+});
+
+export async function createAvatarSession() {
   const apiKey = process.env.RUNWAYML_API_SECRET!;
   const runway = new Runway();
   const convex = new ConvexHttpClient(
@@ -20,7 +33,7 @@ export async function createAvatarSession(avatarId: string) {
   );
   const { id: sessionId } = await runway.realtimeSessions.create({
     model: "gwm1_avatars",
-    avatar: { type: "custom", avatarId },
+    avatar: { type: "custom", avatarId: NOVA_AVATAR_ID },
     maxDuration: 300,
     personality: NOVA_PERSONALITY,
     startScript: NOVA_START_SCRIPT,
@@ -37,9 +50,8 @@ export async function createAvatarSession(avatarId: string) {
     sessionId,
     tools: {
       get_revenue: async (args) => {
-        const revenue = await convex.query(getRevenueRef, {
-          range: args.range as RevenueRange,
-        });
+        const { range } = revenueArgs.parse(args);
+        const revenue = await convex.query(getRevenueRef, { range });
         return {
           total: revenue.total,
           changePct: revenue.changePct,
@@ -47,9 +59,10 @@ export async function createAvatarSession(avatarId: string) {
         };
       },
       create_ticket: async (args) => {
+        const { subject, team } = ticketArgs.parse(args);
         const ticketId = await convex.mutation(createTicketRef, {
-          subject: String(args.subject),
-          team: String(args.team),
+          subject,
+          team,
         });
         return { ticketId };
       },

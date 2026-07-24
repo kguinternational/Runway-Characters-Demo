@@ -22,6 +22,7 @@ Nova’s opening is only:
 
 Expected:
 
+- Nova says she is opening Revenue before the first Page Action;
 - navigation visibly changes from `/` to `/revenue`;
 - Nova highlights the Revenue navigation target before clicking it;
 - Page Actions scroll to and highlight the chart;

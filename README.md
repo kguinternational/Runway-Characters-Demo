@@ -7,16 +7,16 @@ create real support tickets. This demo is configured to run locally only.
 The implementation stays close to Runway’s official examples:
 
 ```tsx
-<AvatarCall avatarId={NOVA_AVATAR_ID} connect={createAvatarSession}>
+<AvatarCall avatarId={NOVA_AVATAR_ID} credentials={credentials}>
   <AvatarVideo />
   <ControlBar showScreenShare />
   <PageActions />
 </AvatarCall>
 ```
 
-The single [Next.js Server Action](./actions/avatar.ts) creates and consumes
-the session and attaches Runway’s `createRpcHandler`. There is no separate RPC
-bridge or API route.
+The single [Next.js Server Action](./actions/avatar.ts) creates and consumes a
+fresh session for each call and attaches Runway’s `createRpcHandler`. There is
+no separate RPC bridge or API route.
 
 ## Run locally
 
@@ -64,8 +64,9 @@ All agent actions have a normal clickable equivalent:
 
 Tool definitions live in [`lib/tools.ts`](./lib/tools.ts).
 Session instructions live in [`lib/avatar.ts`](./lib/avatar.ts): Nova highlights
-before every Page Action click, speaks after every tool sequence, and can explain
-the visible Overview, Revenue, Tickets, and Settings pages.
+before every Page Action click, speaks before client actions and after server
+results, and can explain the visible Overview, Revenue, Tickets, and Settings
+pages.
 
 ## Voice behavior
 
