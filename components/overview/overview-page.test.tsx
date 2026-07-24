@@ -16,6 +16,7 @@ vi.mock("@/components/layout/dashboard-provider", () => ({
 const revenue = {
   total: 122_926,
   changePct: 3.3,
+  refundCount: 0,
   dip: null,
   series: [],
 };
@@ -35,16 +36,21 @@ describe("Overview capability map", () => {
     vi.mocked(useQuery)
       .mockReturnValueOnce(revenue)
       .mockReturnValueOnce([])
-      .mockReturnValueOnce(4);
+      .mockReturnValueOnce({
+        open: 4,
+        topTeam: { team: "Support", count: 3 },
+      });
   });
 
   it("shows every Runway session tool with a manual path", () => {
     render(<OverviewPage />);
 
     for (const label of [
+      "get_overview_insights",
       "get_revenue · set_date_range",
+      "get_ticket_insights · get_ticket · update_ticket_status",
       "create_ticket",
-      "click · open detail",
+      "open_panel",
       "click · scroll_to · highlight",
     ]) {
       expect(screen.getByText(label)).toBeInTheDocument();
@@ -56,25 +62,28 @@ describe("Overview capability map", () => {
     expect(
       screen.getByRole("link", { name: /create a real support ticket/i }),
     ).toHaveAttribute("href", "/tickets#tickets-actions");
+    expect(
+      screen.getByRole("link", { name: /inspect and update the queue/i }),
+    ).toHaveAttribute("href", "/tickets#tickets-table");
   });
 
   it("keeps details and page insights clickable without a Runway call", () => {
     render(<OverviewPage />);
 
     fireEvent.click(
-      screen.getByRole("button", { name: /open a dashboard detail/i }),
+      screen.getByRole("button", { name: /open an insight panel/i }),
     );
     expect(openPanel).toHaveBeenLastCalledWith({
-      title: "One anomaly found",
-      body: "A refund dip is marked in the 30-day revenue view.",
+      title: "Live dashboard detail",
+      body: "No refund anomaly is visible in the current 30-day data.",
     });
 
     fireEvent.click(
-      screen.getByRole("button", { name: /get this page’s insight/i }),
+      screen.getByRole("button", { name: /read the overview insight/i }),
     );
     expect(openPanel).toHaveBeenLastCalledWith({
       title: "Overview insight",
-      body: "$122,926 in 30-day revenue and 4 open tickets. Open Revenue for the refund detail.",
+      body: "$122,926 in 30-day revenue, 3.3% versus the previous period, 0 refund flags, and 4 open tickets. Support owns the largest queue with 3.",
     });
   });
 });

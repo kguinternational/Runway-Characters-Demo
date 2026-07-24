@@ -1,6 +1,11 @@
 "use client";
 
-import { ArrowDownToLine, GitCompareArrows, ReceiptText } from "lucide-react";
+import {
+  ArrowDownToLine,
+  GitCompareArrows,
+  ReceiptText,
+  Sparkles,
+} from "lucide-react";
 import { useQuery } from "convex/react";
 
 import { useDashboard } from "@/components/layout/dashboard-provider";
@@ -14,6 +19,19 @@ import { formatCurrency, formatShortDate } from "@/lib/utils";
 export function RevenuePage() {
   const { range, setRange, openPanel } = useDashboard();
   const revenue = useQuery(api.revenue.getRevenue, { range });
+  const revenueInsight = revenue
+    ? `${formatCurrency(revenue.total)} total at ${formatCurrency(revenue.dailyAverage)} per day, ${revenue.changePct}% versus the previous comparable period. ${
+        revenue.peakDay
+          ? `The peak was ${formatCurrency(revenue.peakDay.amount)} on ${formatShortDate(revenue.peakDay.date)}.`
+          : "No peak day is available."
+      } ${revenue.refundCount} ${
+        revenue.refundCount === 1 ? "refund was" : "refunds were"
+      } flagged. ${
+        revenue.dip
+          ? `The largest was ${formatCurrency(revenue.dip.amount)} on ${formatShortDate(revenue.dip.date)}.`
+          : "No refund anomaly is visible in this range."
+      }`
+    : "Revenue is still loading.";
 
   function exportCsv() {
     if (!revenue) return;
@@ -90,7 +108,21 @@ export function RevenuePage() {
         }
       />
 
-      <div className="mt-5 flex justify-end">
+      <div className="mt-5 flex flex-wrap justify-end gap-2">
+        <Button
+          id="revenue-insight"
+          data-avatar-target="revenue-insight"
+          variant="accent"
+          onClick={() =>
+            openPanel({
+              title: `${range} revenue insight`,
+              body: revenueInsight,
+            })
+          }
+        >
+          <Sparkles className="size-4" />
+          Revenue insight
+        </Button>
         <Button
           id="revenue-explain"
           data-avatar-target="revenue-explain"

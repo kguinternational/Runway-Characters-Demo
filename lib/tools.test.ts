@@ -2,11 +2,16 @@ import { validateClientToolArgs } from "@runwayml/avatars-react/api";
 import { describe, expect, it } from "vitest";
 
 import {
+  openPanelTool,
   sessionTools,
   setDateRangeTool,
 } from "@/lib/tools";
 
 describe("Nova tool contract", () => {
+  it("keeps the demo below Runway's 20-tool session limit", () => {
+    expect(sessionTools).toHaveLength(11);
+  });
+
   it("includes all three Page Actions with model-facing targets", () => {
     for (const name of ["click", "scroll_to", "highlight"]) {
       const tool = sessionTools.find((candidate) => candidate.name === name);
@@ -15,7 +20,6 @@ describe("Nova tool contract", () => {
         true,
       );
     }
-
   });
 
   it("keeps Zod validation and explicit client-tool parameters in sync", () => {
@@ -29,22 +33,35 @@ describe("Nova tool contract", () => {
       name: "range",
       enum: ["7d", "30d", "90d"],
     });
+
+    expect(
+      validateClientToolArgs(openPanelTool, {
+        title: "Revenue insight",
+        body: "Revenue is up.",
+      }),
+    ).toEqual({
+      title: "Revenue insight",
+      body: "Revenue is up.",
+    });
+    expect(validateClientToolArgs(openPanelTool, { title: "Missing body" })).toBeNull();
   });
 
-  it("declares database-backed RPC tools with bounded timeouts", () => {
-    expect(sessionTools).toEqual(
-      expect.arrayContaining([
+  it("declares every database-backed capability with a bounded timeout", () => {
+    for (const name of [
+      "get_overview_insights",
+      "get_revenue",
+      "get_ticket_insights",
+      "get_ticket",
+      "create_ticket",
+      "update_ticket_status",
+    ]) {
+      expect(sessionTools).toContainEqual(
         expect.objectContaining({
           type: "backend_rpc",
-          name: "get_revenue",
+          name,
           timeoutSeconds: 8,
         }),
-        expect.objectContaining({
-          type: "backend_rpc",
-          name: "create_ticket",
-          timeoutSeconds: 8,
-        }),
-      ]),
-    );
+      );
+    }
   });
 });

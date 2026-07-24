@@ -25,6 +25,14 @@ const dipValidator = v.union(
   v.null(),
 );
 
+const peakDayValidator = v.union(
+  v.object({
+    date: v.string(),
+    amount: v.number(),
+  }),
+  v.null(),
+);
+
 const DAYS_BY_RANGE = {
   "7d": 7,
   "30d": 30,
@@ -65,6 +73,9 @@ export const getRevenue = query({
   returns: v.object({
     total: v.number(),
     changePct: v.number(),
+    dailyAverage: v.number(),
+    peakDay: peakDayValidator,
+    refundCount: v.number(),
     dip: dipValidator,
     series: v.array(pointValidator),
   }),
@@ -119,9 +130,24 @@ export const getRevenue = query({
       .filter((point) => point.refunded || point.amount < 0)
       .sort((a, b) => a.amount - b.amount)[0] ?? null;
 
+    const total = round(sum(selectedRows), 2);
+    const peakPoint =
+      series.length === 0
+        ? null
+        : series.reduce((peak, point) =>
+            point.amount > peak.amount ? point : peak,
+          );
+
     return {
-      total: round(sum(selectedRows), 2),
+      total,
       changePct,
+      dailyAverage: series.length === 0 ? 0 : round(total / series.length, 2),
+      peakDay: peakPoint
+        ? { date: peakPoint.date, amount: peakPoint.amount }
+        : null,
+      refundCount: series.filter(
+        (point) => point.refunded || point.amount < 0,
+      ).length,
       dip,
       series,
     };

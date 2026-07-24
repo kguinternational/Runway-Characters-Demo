@@ -48,8 +48,12 @@ type RpcOptions = {
   sessionId: string;
   onDisconnected: () => void;
   tools: {
+    get_overview_insights: () => Promise<unknown>;
     get_revenue: (args: Record<string, unknown>) => Promise<unknown>;
+    get_ticket_insights: () => Promise<unknown>;
+    get_ticket: (args: Record<string, unknown>) => Promise<unknown>;
     create_ticket: (args: Record<string, unknown>) => Promise<unknown>;
+    update_ticket_status: (args: Record<string, unknown>) => Promise<unknown>;
   };
 };
 
@@ -80,12 +84,37 @@ describe("createAvatarSession", () => {
       token: "livekit-token",
       roomName: "room-123",
     });
-    mocks.query.mockResolvedValue({
+    const revenue = {
       total: 122_926,
       changePct: 3.3,
+      dailyAverage: 4_097.53,
+      peakDay: { date: "2026-07-20", amount: 5_120 },
+      refundCount: 1,
       dip: { date: "2026-07-09", amount: -2_850 },
+    };
+    const ticket = {
+      ticketId: 4_806,
+      subject: "Investigate refund",
+      team: "Billing",
+      status: "open",
+      createdAt: 1,
+    };
+    const ticketInsights = {
+      total: 8,
+      open: 5,
+      closed: 3,
+      byTeam: [{ team: "Billing", count: 4 }],
+      topTeam: { team: "Billing", count: 4 },
+      latestTicket: ticket,
+    };
+    mocks.query.mockImplementation(async (_query, args) => {
+      if ("range" in args) return revenue;
+      if ("ticketId" in args) return ticket;
+      return ticketInsights;
     });
-    mocks.mutation.mockResolvedValue(4_806);
+    mocks.mutation.mockImplementation(async (_mutation, args) =>
+      "status" in args ? { ...ticket, status: args.status } : 4_806,
+    );
 
     await expect(createAvatarSession()).resolves.toEqual({
       sessionId: "session-123",
@@ -98,16 +127,16 @@ describe("createAvatarSession", () => {
         model: "gwm1_avatars",
         avatar: { type: "custom", avatarId: NOVA_AVATAR_ID },
         personality: expect.stringContaining(
-          "the order is always speech → tools → speech",
+          "Client tools and Page Actions — order matters",
         ),
         startScript: NOVA_START_SCRIPT,
       }),
     );
     expect(NOVA_PERSONALITY).toContain(
-      "Before every click, call highlight and then click with the same target.",
+      "Before every click, call highlight with the exact target",
     );
     expect(NOVA_PERSONALITY).toContain(
-      "scroll_to and highlight revenue-chart",
+      "Never call a destination-page target in that same response.",
     );
     expect(mocks.pollUntilReady).toHaveBeenCalledWith({
       sessionId: "session-123",
@@ -120,18 +149,47 @@ describe("createAvatarSession", () => {
       }),
     );
     await expect(
+      rpcOptions!.tools.get_overview_insights(),
+    ).resolves.toMatchObject({
+      revenue: { total: 122_926 },
+      support: { open: 5 },
+    });
+    await expect(
       rpcOptions!.tools.get_revenue({ range: "30d" }),
-    ).resolves.toMatchObject({ total: 122_926 });
+    ).resolves.toMatchObject({
+      total: 122_926,
+      dailyAverage: 4_097.53,
+      refundCount: 1,
+    });
+    await expect(rpcOptions!.tools.get_ticket_insights()).resolves.toEqual(
+      ticketInsights,
+    );
+    await expect(
+      rpcOptions!.tools.get_ticket({ ticketId: 4_806 }),
+    ).resolves.toEqual({ ticket });
     await expect(
       rpcOptions!.tools.create_ticket({
         subject: "Investigate refund",
         team: "Billing",
       }),
     ).resolves.toEqual({ ticketId: 4_806 });
+    await expect(
+      rpcOptions!.tools.update_ticket_status({
+        ticketId: 4_806,
+        status: "closed",
+      }),
+    ).resolves.toMatchObject({ ticketId: 4_806, status: "closed" });
     expect(mocks.query).toHaveBeenCalledWith(expect.anything(), { range: "30d" });
+    expect(mocks.query).toHaveBeenCalledWith(expect.anything(), {
+      ticketId: 4_806,
+    });
     expect(mocks.mutation).toHaveBeenCalledWith(expect.anything(), {
       subject: "Investigate refund",
       team: "Billing",
+    });
+    expect(mocks.mutation).toHaveBeenCalledWith(expect.anything(), {
+      ticketId: 4_806,
+      status: "closed",
     });
     expect(mocks.consumeSession).toHaveBeenCalledWith({
       sessionId: "session-123",

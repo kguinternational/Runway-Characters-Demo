@@ -7,9 +7,11 @@ import type { TicketRecord } from "@/lib/types";
 export function TicketsTable({
   tickets,
   onTicketClick,
+  onStatusChange,
 }: {
   tickets?: TicketRecord[];
   onTicketClick: (ticket: TicketRecord) => void;
+  onStatusChange: (ticket: TicketRecord) => Promise<void>;
 }) {
   return (
     <Card
@@ -24,7 +26,9 @@ export function TicketsTable({
               <th className="px-6 py-3.5 font-medium">Ticket</th>
               <th className="px-4 py-3.5 font-medium">Subject</th>
               <th className="px-4 py-3.5 font-medium">Team</th>
-              <th className="px-6 py-3.5 text-right font-medium">Status</th>
+              <th className="px-6 py-3.5 text-right font-medium">
+                Click status to change
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -47,6 +51,7 @@ export function TicketsTable({
                 className="cursor-pointer border-b border-[var(--line)] text-sm transition last:border-0 hover:bg-[var(--surface-raised)]"
                 onClick={() => onTicketClick(ticket)}
                 onKeyDown={(event) => {
+                  if (event.currentTarget !== event.target) return;
                   if (event.key === "Enter" || event.key === " ") onTicketClick(ticket);
                 }}
               >
@@ -58,14 +63,31 @@ export function TicketsTable({
                 </td>
                 <td className="px-4 py-4 text-[var(--muted)]">{ticket.team}</td>
                 <td className="px-6 py-4 text-right">
-                  <StatusPill tone={ticket.status === "open" ? "warning" : "positive"}>
-                    {ticket.status === "open" ? (
-                      <Clock3 className="size-3" />
-                    ) : (
-                      <CircleCheck className="size-3" />
-                    )}
-                    {ticket.status}
-                  </StatusPill>
+                  <button
+                    id={`ticket-status-${ticket.ticketId}`}
+                    data-avatar-target={`ticket-status-${ticket.ticketId}`}
+                    type="button"
+                    title={`Mark as ${ticket.status === "open" ? "closed" : "open"}`}
+                    aria-label={`Mark ticket ${ticket.ticketId} ${
+                      ticket.status === "open" ? "closed" : "open"
+                    }`}
+                    className="rounded-full transition hover:opacity-70"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onStatusChange(ticket);
+                    }}
+                  >
+                    <StatusPill
+                      tone={ticket.status === "open" ? "warning" : "positive"}
+                    >
+                      {ticket.status === "open" ? (
+                        <Clock3 className="size-3" />
+                      ) : (
+                        <CircleCheck className="size-3" />
+                      )}
+                      {ticket.status}
+                    </StatusPill>
+                  </button>
                 </td>
               </tr>
             ))}

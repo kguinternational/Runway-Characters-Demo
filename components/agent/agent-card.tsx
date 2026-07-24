@@ -5,6 +5,8 @@ import {
   AvatarVideo,
   ControlBar,
   PageActions,
+  ScreenShareVideo,
+  UserVideo,
 } from "@runwayml/avatars-react";
 import { Headphones } from "lucide-react";
 import Image from "next/image";
@@ -61,8 +63,10 @@ export function AgentCard() {
           onError={handleCallError}
         >
           <AvatarVideo />
-          <ControlBar showCamera={false} showScreenShare />
+          <UserVideo />
           <PageActions />
+          <ScreenShareVideo />
+          <ControlBar showCamera={true} showScreenShare />
           <ClientToolHandlers />
         </AvatarCall>
       ) : (
@@ -90,8 +94,8 @@ export function AgentCard() {
               What Nova can do
             </p>
             <p className="mt-2 text-xs leading-5 text-white/62">
-              Navigate, click, scroll, highlight, explain pages, change revenue
-              ranges, read live revenue, open details, and create tickets.
+              Navigate and highlight the UI, show live dashboard insights,
+              change revenue ranges, open panels, and create or update tickets.
             </p>
           </div>
           <div className="mt-5">

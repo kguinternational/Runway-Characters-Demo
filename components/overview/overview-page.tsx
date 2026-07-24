@@ -16,8 +16,17 @@ export function OverviewPage() {
   const { openPanel } = useDashboard();
   const revenue = useQuery(api.revenue.getRevenue, { range: "30d" });
   const tickets = useQuery(api.tickets.listRecent, { limit: 4 });
-  const openCount = useQuery(api.tickets.getOpenCount);
-  const refundCount = revenue?.series.filter((point) => point.refunded).length;
+  const ticketInsights = useQuery(api.tickets.getInsights);
+  const openCount = ticketInsights?.open;
+  const refundCount = revenue?.refundCount;
+  const overviewInsight =
+    revenue && ticketInsights
+      ? `${formatCurrency(revenue.total)} in 30-day revenue, ${revenue.changePct}% versus the previous period, ${revenue.refundCount} refund flags, and ${ticketInsights.open} open tickets.${
+          ticketInsights.topTeam
+            ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
+            : ""
+        }`
+      : "The live overview data is still loading.";
 
   return (
     <div id="overview-page" data-avatar-target="overview-page">
@@ -141,22 +150,53 @@ export function OverviewPage() {
             Every function is clickable.
           </h2>
           <div className="mt-5 grid gap-2">
+            <button
+              id="overview-insight"
+              data-avatar-target="overview-insight"
+              className="rounded-xl bg-[var(--ink)] px-4 py-3 text-left text-[var(--paper)]"
+              onClick={() =>
+                openPanel({
+                  title: "Overview insight",
+                  body: overviewInsight,
+                })
+              }
+            >
+              <span className="block text-sm font-semibold">
+                Read the overview insight
+              </span>
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] opacity-55">
+                get_overview_insights
+              </span>
+            </button>
             <Link
               id="overview-open-revenue"
               data-avatar-target="overview-open-revenue"
               href="/revenue#revenue-chart"
-              className="rounded-xl bg-[var(--ink)] px-4 py-3 text-[var(--paper)]"
+              className="rounded-xl border border-[var(--line)] px-4 py-3"
             >
               <span className="block text-sm font-semibold">
                 Read revenue + change range
               </span>
-              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] opacity-55">
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
                 get_revenue · set_date_range
               </span>
             </Link>
             <Link
               id="overview-open-tickets"
               data-avatar-target="overview-open-tickets"
+              href="/tickets#tickets-table"
+              className="rounded-xl border border-[var(--line)] px-4 py-3"
+            >
+              <span className="block text-sm font-semibold">
+                Inspect and update the queue
+              </span>
+              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
+                get_ticket_insights · get_ticket · update_ticket_status
+              </span>
+            </Link>
+            <Link
+              id="overview-create-ticket"
+              data-avatar-target="overview-create-ticket"
               href="/tickets#tickets-actions"
               className="rounded-xl border border-[var(--line)] px-4 py-3"
             >
@@ -173,16 +213,18 @@ export function OverviewPage() {
               className="rounded-xl border border-[var(--line)] px-4 py-3 text-left"
               onClick={() =>
                 openPanel({
-                  title: "One anomaly found",
-                  body: "A refund dip is marked in the 30-day revenue view.",
+                  title: "Live dashboard detail",
+                  body: revenue?.dip
+                    ? `${formatCurrency(revenue.dip.amount)} is marked as a refund in the 30-day revenue view.`
+                    : "No refund anomaly is visible in the current 30-day data.",
                 })
               }
             >
               <span className="block text-sm font-semibold">
-                Open a dashboard detail
+                Open an insight panel
               </span>
               <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
-                click · open detail
+                open_panel
               </span>
             </button>
             <a
@@ -198,27 +240,6 @@ export function OverviewPage() {
                 click · scroll_to · highlight
               </span>
             </a>
-            <button
-              id="overview-insight"
-              data-avatar-target="overview-insight"
-              className="rounded-xl border border-[var(--line)] px-4 py-3 text-left"
-              onClick={() =>
-                openPanel({
-                  title: "Overview insight",
-                  body:
-                    revenue && openCount !== undefined
-                      ? `${formatCurrency(revenue.total)} in 30-day revenue and ${openCount} open tickets. Open Revenue for the refund detail.`
-                      : "The live overview data is still loading.",
-                })
-              }
-            >
-              <span className="block text-sm font-semibold">
-                Get this page’s insight
-              </span>
-              <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
-                Available by click or conversation
-              </span>
-            </button>
           </div>
         </Card>
       </div>

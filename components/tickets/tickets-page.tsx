@@ -1,7 +1,7 @@
 "use client";
 
-import { Plus, SlidersHorizontal } from "lucide-react";
-import { useQuery } from "convex/react";
+import { Plus, SlidersHorizontal, Sparkles } from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 
 import { useDashboard } from "@/components/layout/dashboard-provider";
@@ -17,6 +17,8 @@ type Filter = "all" | "open" | "billing";
 export function TicketsPage() {
   const { openPanel } = useDashboard();
   const tickets = useQuery(api.tickets.listRecent, { limit: 30 });
+  const ticketInsights = useQuery(api.tickets.getInsights);
+  const updateStatus = useMutation(api.tickets.updateStatus);
   const [filter, setFilter] = useState<Filter>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const filteredTickets = tickets?.filter((ticket) => {
@@ -24,6 +26,17 @@ export function TicketsPage() {
     if (filter === "billing") return ticket.team === "Billing";
     return true;
   });
+  const queueInsight = ticketInsights
+    ? `${ticketInsights.open} open and ${ticketInsights.closed} closed across ${ticketInsights.total} tickets.${
+        ticketInsights.topTeam
+          ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
+          : ""
+      }${
+        ticketInsights.latestTicket
+          ? ` Latest is #${ticketInsights.latestTicket.ticketId}: ${ticketInsights.latestTicket.subject}.`
+          : ""
+      }`
+    : "The ticket queue is still loading.";
 
   return (
     <div id="tickets-page" data-avatar-target="tickets-page">
@@ -56,7 +69,21 @@ export function TicketsPage() {
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            id="tickets-insight"
+            data-avatar-target="tickets-insight"
+            variant="outline"
+            onClick={() =>
+              openPanel({
+                title: "Ticket queue insight",
+                body: queueInsight,
+              })
+            }
+          >
+            <Sparkles className="size-4" />
+            Queue insight
+          </Button>
           <Button
             id="ticket-filter-help"
             data-avatar-target="ticket-filter-help"
@@ -91,6 +118,14 @@ export function TicketsPage() {
             body: `${ticket.subject} is ${ticket.status} and owned by ${ticket.team}.`,
           })
         }
+        onStatusChange={async (ticket) => {
+          const status = ticket.status === "open" ? "closed" : "open";
+          await updateStatus({ ticketId: ticket.ticketId, status });
+          openPanel({
+            title: `Ticket #${ticket.ticketId} updated`,
+            body: `${ticket.subject} is now ${status}.`,
+          });
+        }}
       />
 
       <NewTicketDialog
