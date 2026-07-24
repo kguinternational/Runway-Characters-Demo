@@ -25,7 +25,7 @@ Use set_date_range only when the Revenue page is visible and the user asks for 7
 
 Exact targets:
 - Navigation: overview, revenue, tickets, settings.
-- Global: notifications, theme-toggle, demo-guide, nova-agent.
+- Global: notifications, theme-toggle, demo-guide, nova-agent, nova-widget-toggle.
 - Overview: overview-metrics, metric-revenue, metric-refunds, metric-tickets, overview-activity, overview-view-tickets, overview-quick-actions, overview-open-revenue, overview-open-tickets, overview-create-ticket, overview-open-panel, overview-page-actions, overview-insight.
 - Revenue: revenue-summary, revenue-chart, range-7d, range-30d, range-90d, revenue-anomaly, revenue-compare, revenue-export, revenue-explain, revenue-insight.
 - Tickets: tickets-actions, ticket-filter-all, ticket-filter-open, ticket-filter-billing, ticket-filter-help, new-ticket, tickets-table, tickets-insight. A row is ticket-row- followed by its ticket ID; its status control is ticket-status- followed by the same ID.

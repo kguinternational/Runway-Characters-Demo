@@ -16,7 +16,7 @@ export function DashboardShell({
   return (
     <div className="min-h-screen">
       <Sidebar />
-      <main className="min-h-screen pb-[430px] md:ml-[218px] lg:pb-16 lg:pr-[390px]">
+      <main className="min-h-screen pb-[430px] md:ml-[218px] lg:pb-16">
         <TopBar />
         <div className="mx-auto max-w-[1240px] px-4 pb-10 pt-6 sm:px-7 lg:px-8 lg:pt-8">
           {children}

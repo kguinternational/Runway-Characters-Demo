@@ -128,6 +128,9 @@ The layout follows Runway’s
 and `<ScreenShareVideo />` display their respective feeds only while those
 tracks are active.
 
+Nova opens as a full-height right-side panel and can be minimized without
+unmounting an active call.
+
 The app relies on the hosted session and the SDK’s standard `ControlBar` for
 microphone, camera, and screen sharing. It does not add custom media handling.
 Share the current Northstar tab and wait for the control bar to show that
