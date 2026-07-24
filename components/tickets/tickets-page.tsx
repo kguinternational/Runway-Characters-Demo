@@ -1,7 +1,11 @@
 "use client";
 
-import { Plus, SlidersHorizontal, Sparkles } from "lucide-react";
-import { useMutation, useQuery } from "convex/react";
+import {
+  Plus,
+  RefreshCw,
+  SlidersHorizontal,
+  Sparkles,
+} from "lucide-react";
 import { useState } from "react";
 
 import { useDashboard } from "@/components/layout/dashboard-provider";
@@ -9,38 +13,41 @@ import { PageHeader } from "@/components/layout/page-header";
 import { NewTicketDialog } from "@/components/tickets/new-ticket-dialog";
 import { TicketsTable } from "@/components/tickets/tickets-table";
 import { Button } from "@/components/ui/button";
-import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
 export function TicketsPage() {
-  const { openPanel, ticketFilter, setTicketFilter } = useDashboard();
-  const tickets = useQuery(api.tickets.listRecent, { limit: 30 });
-  const ticketInsights = useQuery(api.tickets.getInsights);
-  const updateStatus = useMutation(api.tickets.updateStatus);
+  const {
+    createTicket,
+    openPanel,
+    refreshTickets,
+    ticketFilter,
+    ticketInsights,
+    tickets,
+    setTicketFilter,
+    updateTicketStatus,
+  } = useDashboard();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const filteredTickets = tickets?.filter((ticket) => {
+  const filteredTickets = tickets.filter((ticket) => {
     if (ticketFilter === "open") return ticket.status === "open";
     if (ticketFilter === "billing") return ticket.team === "Billing";
     return true;
   });
-  const queueInsight = ticketInsights
-    ? `${ticketInsights.open} open and ${ticketInsights.closed} closed across ${ticketInsights.total} tickets.${
-        ticketInsights.topTeam
-          ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
-          : ""
-      }${
-        ticketInsights.latestTicket
-          ? ` Latest is #${ticketInsights.latestTicket.ticketId}: ${ticketInsights.latestTicket.subject}.`
-          : ""
-      }`
-    : "The ticket queue is still loading.";
+  const queueInsight = `${ticketInsights.open} open and ${ticketInsights.closed} closed across ${ticketInsights.total} tickets.${
+    ticketInsights.topTeam
+      ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
+      : ""
+  }${
+    ticketInsights.latestTicket
+      ? ` Latest is #${ticketInsights.latestTicket.ticketId}: ${ticketInsights.latestTicket.subject}.`
+      : ""
+  }`;
 
   return (
     <div id="tickets-page" data-avatar-target="tickets-page">
       <PageHeader
         eyebrow="Customer support"
         title="Work the queue."
-        description="Filter, inspect, and create the same real tickets available to Nova’s server tool."
+        description="Filter, inspect, and update the same local demo tickets available to Nova."
       />
 
       <section
@@ -97,6 +104,21 @@ export function TicketsPage() {
             Filters
           </Button>
           <Button
+            id="tickets-refresh"
+            data-avatar-target="tickets-refresh"
+            variant="outline"
+            onClick={async () => {
+              await refreshTickets();
+              openPanel({
+                title: "Ticket queue refreshed",
+                body: "The visible queue now matches the shared local demo store.",
+              });
+            }}
+          >
+            <RefreshCw className="size-4" />
+            Refresh
+          </Button>
+          <Button
             id="new-ticket"
             data-avatar-target="new-ticket"
             variant="accent"
@@ -118,7 +140,7 @@ export function TicketsPage() {
         }
         onStatusChange={async (ticket) => {
           const status = ticket.status === "open" ? "closed" : "open";
-          await updateStatus({ ticketId: ticket.ticketId, status });
+          await updateTicketStatus({ ticketId: ticket.ticketId, status });
           openPanel({
             title: `Ticket #${ticket.ticketId} updated`,
             body: `${ticket.subject} is now ${status}.`,
@@ -129,10 +151,11 @@ export function TicketsPage() {
       <NewTicketDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onCreated={(ticketId, subject, team) =>
+        onCreate={createTicket}
+        onCreated={(ticket) =>
           openPanel({
-            title: `Ticket #${ticketId} created`,
-            body: `${subject} is open and assigned to ${team}.`,
+            title: `Ticket #${ticket.ticketId} created`,
+            body: `${ticket.subject} is open and assigned to ${ticket.team}.`,
           })
         }
       />

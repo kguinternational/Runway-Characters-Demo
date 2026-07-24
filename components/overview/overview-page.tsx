@@ -2,31 +2,24 @@
 
 import { BadgeAlert, CreditCard, TicketCheck } from "lucide-react";
 import Link from "next/link";
-import { useQuery } from "convex/react";
 
 import { useDashboard } from "@/components/layout/dashboard-provider";
 import { MetricCard } from "@/components/layout/metric-card";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { StatusPill } from "@/components/ui/status-pill";
-import { api } from "@/convex/_generated/api";
+import { getDemoRevenue } from "@/lib/demo-data";
 import { formatCurrency } from "@/lib/utils";
 
 export function OverviewPage() {
-  const { openPanel } = useDashboard();
-  const revenue = useQuery(api.revenue.getRevenue, { range: "30d" });
-  const tickets = useQuery(api.tickets.listRecent, { limit: 4 });
-  const ticketInsights = useQuery(api.tickets.getInsights);
-  const openCount = ticketInsights?.open;
-  const refundCount = revenue?.refundCount;
-  const overviewInsight =
-    revenue && ticketInsights
-      ? `${formatCurrency(revenue.total)} in 30-day revenue, ${revenue.changePct}% versus the previous period, ${revenue.refundCount} refund flags, and ${ticketInsights.open} open tickets.${
-          ticketInsights.topTeam
-            ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
-            : ""
-        }`
-      : "The live overview data is still loading.";
+  const { openPanel, tickets, ticketInsights } = useDashboard();
+  const revenue = getDemoRevenue("30d");
+  const recentTickets = tickets.slice(0, 4);
+  const overviewInsight = `${formatCurrency(revenue.total)} in 30-day revenue, ${revenue.changePct}% versus the previous period, ${revenue.refundCount} refund flags, and ${ticketInsights.open} open tickets.${
+    ticketInsights.topTeam
+      ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
+      : ""
+  }`;
 
   return (
     <div id="overview-page" data-avatar-target="overview-page">
@@ -44,44 +37,42 @@ export function OverviewPage() {
         <MetricCard
           id="metric-revenue"
           eyebrow="30-day revenue"
-          value={revenue ? formatCurrency(revenue.total) : undefined}
-          detail={revenue ? `${revenue.changePct}% vs previous period` : "Loading"}
+          value={formatCurrency(revenue.total)}
+          detail={`${revenue.changePct}% vs previous period`}
           icon={CreditCard}
-          trend={revenue && revenue.changePct < 0 ? "down" : "up"}
+          trend={revenue.changePct < 0 ? "down" : "up"}
           onClick={() =>
             openPanel({
               title: "Revenue snapshot",
-              body: revenue
-                ? `${formatCurrency(revenue.total)} over 30 days, ${revenue.changePct}% versus the previous period.`
-                : "Revenue is still loading.",
+              body: `${formatCurrency(revenue.total)} over 30 days, ${revenue.changePct}% versus the previous period.`,
             })
           }
         />
         <MetricCard
           id="metric-refunds"
           eyebrow="Refunds flagged"
-          value={refundCount === undefined ? undefined : String(refundCount)}
-          detail="Marked in live Convex rows"
+          value={String(revenue.refundCount)}
+          detail="Marked in the bundled demo rows"
           icon={BadgeAlert}
-          trend={refundCount ? "down" : "neutral"}
+          trend={revenue.refundCount ? "down" : "neutral"}
           onClick={() =>
             openPanel({
               title: "Refund flags",
-              body: `${refundCount ?? 0} refund rows are marked in the current 30-day period.`,
+              body: `${revenue.refundCount} refund rows are marked in the current 30-day period.`,
             })
           }
         />
         <MetricCard
           id="metric-tickets"
           eyebrow="Tickets open"
-          value={openCount === undefined ? undefined : String(openCount)}
-          detail="Updates from live Convex data"
+          value={String(ticketInsights.open)}
+          detail="Shared local demo queue"
           icon={TicketCheck}
           trend="neutral"
           onClick={() =>
             openPanel({
               title: "Support queue",
-              body: `${openCount ?? 0} tickets are currently open. Visit Tickets to inspect or create one.`,
+              body: `${ticketInsights.open} tickets are currently open. Visit Tickets to inspect or create one.`,
             })
           }
           className="sm:col-span-2 xl:col-span-1"
@@ -111,7 +102,7 @@ export function OverviewPage() {
             </Link>
           </div>
           <div className="divide-y divide-[var(--line)]">
-            {tickets?.map((ticket) => (
+            {recentTickets.map((ticket) => (
               <button
                 key={ticket.ticketId}
                 id={`overview-ticket-${ticket.ticketId}`}
@@ -192,7 +183,7 @@ export function OverviewPage() {
               </span>
               <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
                 get_ticket_insights · get_ticket · filter_tickets ·
-                update_ticket_status
+                update_ticket_status · refresh_tickets
               </span>
             </Link>
             <Link
@@ -202,7 +193,7 @@ export function OverviewPage() {
               className="rounded-xl border border-[var(--line)] px-4 py-3"
             >
               <span className="block text-sm font-semibold">
-                Create a real support ticket
+                Create a demo support ticket
               </span>
               <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
                 create_ticket
@@ -214,8 +205,8 @@ export function OverviewPage() {
               className="rounded-xl border border-[var(--line)] px-4 py-3 text-left"
               onClick={() =>
                 openPanel({
-                  title: "Live dashboard detail",
-                  body: revenue?.dip
+                  title: "Demo dashboard detail",
+                  body: revenue.dip
                     ? `${formatCurrency(revenue.dip.amount)} is marked as a refund in the 30-day revenue view.`
                     : "No refund anomaly is visible in the current 30-day data.",
                 })

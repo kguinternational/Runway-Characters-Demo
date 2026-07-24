@@ -1,32 +1,35 @@
 "use client";
 
 import { LoaderCircle, X } from "lucide-react";
-import { useMutation } from "convex/react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { api } from "@/convex/_generated/api";
+import type { TicketRecord, TicketTeam } from "@/lib/types";
 
 export function NewTicketDialog({
   open,
   onClose,
+  onCreate,
   onCreated,
 }: {
   open: boolean;
   onClose: () => void;
-  onCreated: (ticketId: number, subject: string, team: string) => void;
+  onCreate: (input: {
+    subject: string;
+    team: TicketTeam;
+  }) => Promise<TicketRecord>;
+  onCreated: (ticket: TicketRecord) => void;
 }) {
-  const createTicket = useMutation(api.tickets.createTicket);
   const [subject, setSubject] = useState("Investigate refund in the 30-day revenue report");
-  const [team, setTeam] = useState("Billing");
+  const [team, setTeam] = useState<TicketTeam>("Billing");
   const [saving, setSaving] = useState(false);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setSaving(true);
     try {
-      const ticketId = await createTicket({ subject, team });
-      onCreated(ticketId, subject, team);
+      const ticket = await onCreate({ subject, team });
+      onCreated(ticket);
       onClose();
     } finally {
       setSaving(false);
@@ -48,7 +51,7 @@ export function NewTicketDialog({
         <div className="flex items-center justify-between">
           <div>
             <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--muted)]">
-              Convex mutation
+              Local demo ticket
             </p>
             <h2 className="mt-2 text-2xl font-semibold">Create a ticket</h2>
           </div>
@@ -81,7 +84,7 @@ export function NewTicketDialog({
             id="ticket-team"
             data-avatar-target="ticket-team"
             value={team}
-            onChange={(event) => setTeam(event.target.value)}
+            onChange={(event) => setTeam(event.target.value as TicketTeam)}
             className="mt-2 w-full rounded-xl border border-[var(--line)] bg-[var(--surface-raised)] px-4 py-3 font-normal outline-none"
           >
             <option>Billing</option>
@@ -98,7 +101,7 @@ export function NewTicketDialog({
           disabled={saving}
         >
           {saving ? <LoaderCircle className="size-4 animate-spin" /> : null}
-          Create real ticket
+          Create demo ticket
         </Button>
       </form>
     </div>

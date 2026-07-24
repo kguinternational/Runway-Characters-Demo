@@ -1,4 +1,4 @@
-import { DatabaseZap } from "lucide-react";
+import { Layers3 } from "lucide-react";
 
 import { StatusPill } from "@/components/ui/status-pill";
 
@@ -25,8 +25,8 @@ export function PageHeader({
         </p>
       </div>
       <StatusPill tone="positive" className="h-fit w-fit">
-        <DatabaseZap className="size-3" />
-        Convex synced
+        <Layers3 className="size-3" />
+        Demo data ready
       </StatusPill>
     </header>
   );

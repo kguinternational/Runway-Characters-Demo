@@ -6,35 +6,31 @@ import {
   ReceiptText,
   Sparkles,
 } from "lucide-react";
-import { useQuery } from "convex/react";
 
 import { useDashboard } from "@/components/layout/dashboard-provider";
 import { PageHeader } from "@/components/layout/page-header";
 import { RevenueChart } from "@/components/revenue/revenue-chart";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { api } from "@/convex/_generated/api";
+import { getDemoRevenue } from "@/lib/demo-data";
 import { formatCurrency, formatShortDate } from "@/lib/utils";
 
 export function RevenuePage() {
   const { range, setRange, openPanel } = useDashboard();
-  const revenue = useQuery(api.revenue.getRevenue, { range });
-  const revenueInsight = revenue
-    ? `${formatCurrency(revenue.total)} total at ${formatCurrency(revenue.dailyAverage)} per day, ${revenue.changePct}% versus the previous comparable period. ${
-        revenue.peakDay
-          ? `The peak was ${formatCurrency(revenue.peakDay.amount)} on ${formatShortDate(revenue.peakDay.date)}.`
-          : "No peak day is available."
-      } ${revenue.refundCount} ${
-        revenue.refundCount === 1 ? "refund was" : "refunds were"
-      } flagged. ${
-        revenue.dip
-          ? `The largest was ${formatCurrency(revenue.dip.amount)} on ${formatShortDate(revenue.dip.date)}.`
-          : "No refund anomaly is visible in this range."
-      }`
-    : "Revenue is still loading.";
+  const revenue = getDemoRevenue(range);
+  const revenueInsight = `${formatCurrency(revenue.total)} total at ${formatCurrency(revenue.dailyAverage)} per day, ${revenue.changePct}% versus the previous comparable period. ${
+    revenue.peakDay
+      ? `The peak was ${formatCurrency(revenue.peakDay.amount)} on ${formatShortDate(revenue.peakDay.date)}.`
+      : "No peak day is available."
+  } ${revenue.refundCount} ${
+    revenue.refundCount === 1 ? "refund was" : "refunds were"
+  } flagged. ${
+    revenue.dip
+      ? `The largest was ${formatCurrency(revenue.dip.amount)} on ${formatShortDate(revenue.dip.date)}.`
+      : "No refund anomaly is visible in this range."
+  }`;
 
   function exportCsv() {
-    if (!revenue) return;
     const rows = ["date,amount,refunded", ...revenue.series.map((row) =>
       `${row.date},${row.amount},${Boolean(row.refunded)}`,
     )];
@@ -51,7 +47,7 @@ export function RevenuePage() {
       <PageHeader
         eyebrow="Revenue intelligence"
         title="Find what changed."
-        description="Change the range, inspect the refund, or export the same live rows Nova reads."
+        description="Change the range, inspect the refund, or export the same demo rows Nova reads."
       />
 
       <section
@@ -64,7 +60,7 @@ export function RevenuePage() {
             Selected total
           </p>
           <p className="mt-3 text-2xl font-semibold">
-            {revenue ? formatCurrency(revenue.total) : "Loading…"}
+            {formatCurrency(revenue.total)}
           </p>
         </Card>
         <button
@@ -74,9 +70,7 @@ export function RevenuePage() {
           onClick={() =>
             openPanel({
               title: "Period comparison",
-              body: revenue
-                ? `${range} revenue is ${revenue.changePct}% versus the previous comparable period.`
-                : "Revenue is loading.",
+              body: `${range} revenue is ${revenue.changePct}% versus the previous comparable period.`,
             })
           }
         >
@@ -130,7 +124,7 @@ export function RevenuePage() {
           onClick={() =>
             openPanel({
               title: "How this is calculated",
-              body: "The total sums settled daily rows from Convex. Negative refund rows remain visible.",
+              body: "The total sums the bundled daily demo rows. Negative refund rows remain visible.",
             })
           }
         >

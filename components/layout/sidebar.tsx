@@ -71,7 +71,7 @@ export function Sidebar() {
           <Sparkles className="size-4 text-[var(--accent)]" />
           <p className="mt-3 text-sm font-semibold">Nova is on call</p>
           <p className="mt-1 text-xs leading-5 text-white/42">
-            Navigate, act, and query live data.
+            Navigate, act, and inspect demo data.
           </p>
         </div>
         <button

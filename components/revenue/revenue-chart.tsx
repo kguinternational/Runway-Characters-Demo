@@ -47,7 +47,7 @@ export function RevenueChart({
         <div>
           <div className="flex items-center gap-2">
             <p className="font-mono text-[0.68rem] uppercase tracking-[0.18em] text-[var(--muted)]">
-              Live net revenue
+              Demo net revenue
             </p>
             <StatusPill tone={dip ? "danger" : "positive"}>
               {dip ? "Refund marked" : "Healthy"}

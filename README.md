@@ -1,8 +1,8 @@
 # Northstar — Runway Characters demo
 
-Northstar is a small, local-only Next.js 16 analytics dashboard with Nova, a
-realtime Runway Character. Nova can navigate the same pages as the user, operate
-visible controls, explain live Convex data, and manage support tickets.
+Northstar is a small, local-only Next.js 16 dashboard with Nova, a realtime
+Runway Character. Nova can navigate the same pages as the user, operate visible
+controls, explain the bundled demo data, and manage an in-memory support queue.
 
 The integration deliberately stays close to Runway’s official examples:
 
@@ -44,9 +44,9 @@ function NovaCall() {
       onEnd={() => setSession(null)}
       className="h-full !aspect-auto"
     >
-      <AvatarVideo />
-      <UserVideo />
-      <ScreenShareVideo />
+      <AvatarVideo className="!absolute inset-0" />
+      <ScreenShareVideo className="!absolute bottom-32 left-4 aspect-video !h-auto !w-[55%] overflow-hidden rounded-lg" />
+      <UserVideo className="!bottom-32" />
       <ControlBar showCamera={true} showScreenShare />
       <PageActions highlightDuration={3000} scrollBlock="center" />
     </AvatarCall>
@@ -54,117 +54,119 @@ function NovaCall() {
 }
 ```
 
-The single [Next.js Server Action](./actions/avatar.ts) creates and consumes a
-fresh session and attaches Runway’s `createRpcHandler`. There is no API route,
-custom RPC bridge, or second session endpoint. Every Start click fetches fresh
-one-use credentials, so hanging up and starting a second call does not reuse the
+[`actions/avatar.ts`](./actions/avatar.ts) is the single Runway Server Action
+file. It creates and consumes a fresh session and attaches Runway’s
+`createRpcHandler`. There is no API route or custom RPC bridge. Every Start
+click requests fresh one-use credentials, so a second call does not reuse the
 first session.
 
 ## Run locally
 
-Requirements: Node 22.13+, pnpm, a Runway API key with Characters credits, and a
-Convex account.
+Requirements: Node 22.13+, pnpm, and a Runway API key with Characters credits.
 
 ```bash
 pnpm install
 cp .env.example .env.local
 ```
 
-Set the key only in `.env.local`:
+Set the key in `.env.local`:
 
 ```bash
 RUNWAYML_API_SECRET=key_...
 ```
 
-`RUNWAYML_API_SECRET` is read by the Server Action. Never rename it with a
-`NEXT_PUBLIC_` prefix or use it in a client component.
+The key is read only by the Server Action. Do not give it a `NEXT_PUBLIC_`
+prefix or import it into a client component.
 
-Start Convex, seed the local demo data, and run Next.js:
+Start the app:
 
 ```bash
-pnpm demo
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). This project is for local
-demo use; it has no Vercel deployment step.
+Open [http://localhost:3000](http://localhost:3000). The demo workflow ends on
+localhost.
+
+## Demo data
+
+- Revenue is a deterministic set of bundled daily rows, so totals, ranges,
+  peaks, and the refund dip remain consistent between recordings.
+- Tickets begin from a bundled seed and live in server memory while the app is
+  running.
+- Creating or updating a ticket changes that in-memory queue.
+- Restarting the Next.js server restores the original ticket seed.
+- `refresh_tickets` reloads the visible queue after Nova creates or updates a
+  ticket. The **Refresh** button provides the same manual action.
+
+[`lib/demo-data.ts`](./lib/demo-data.ts) contains the readable fixtures and
+calculations. [`lib/demo-store.ts`](./lib/demo-store.ts) owns the shared
+in-memory ticket state. [`actions/demo.ts`](./actions/demo.ts) contains the
+small set of Server Actions used by the clickable ticket UI. Both the manual
+controls and Nova’s RPC tools operate on the same ticket state.
 
 ## Routes
 
-- `/` — dashboard brief, clickable KPIs, recent activity, and every capability.
-- `/revenue` — 7/30/90-day controls, live chart, average, peak, refund detail,
-  and CSV export.
-- `/tickets` — queue insight, filters, exact ticket detail, creation, and
-  close/reopen controls.
+- `/` — overview brief, clickable KPIs, recent activity, and the capability map.
+- `/revenue` — 7/30/90-day controls, chart, average, peak, refund detail, and
+  CSV export.
+- `/tickets` — queue insight, filters, exact ticket detail, Refresh, creation,
+  and close/reopen controls.
 - `/settings` — theme, alerts, character detail, microphone test, and call
   guidance.
 
 The shared layout keeps `AvatarCall` mounted while Next.js navigates between
 pages.
 
-## Tool model
+## All 13 session tools
 
-The implementation follows Runway’s documented split:
+Everything Nova can do also has a normal clickable path.
+
+| Type | Tool | Nova action | Manual equivalent |
+| --- | --- | --- | --- |
+| Page Action | `click` | Click a visible target | Click the same link, card, row, or button. |
+| Page Action | `scroll_to` | Bring a target into view | Scroll normally or click the Overview Page Actions preview. |
+| Page Action | `highlight` | Pulse a visible target before acting | Click the Overview Page Actions preview. |
+| Client | `set_date_range` | Show 7, 30, or 90 days | Click the range control on Revenue. |
+| Client | `filter_tickets` | Show All, Open, or Billing tickets | Click the queue filter on Tickets. |
+| Client | `open_panel` | Open a short information modal | Click an insight, KPI, anomaly, or ticket row. |
+| Client | `refresh_tickets` | Reload the visible queue after a ticket change | Click **Refresh** on Tickets. |
+| Server | `get_overview_insights` | Return the overview brief for Nova to speak | Click **Overview insight**. |
+| Server | `get_revenue` | Return totals, change, average, peak, and refund facts | Click **Revenue insight**. |
+| Server | `get_ticket_insights` | Return queue totals and team workload | Click **Queue insight**. |
+| Server | `get_ticket` | Return one ticket by numeric ID | Click its ticket row. |
+| Server | `create_ticket` | Add a ticket and return the new record | Click **New ticket**, complete the form, and submit. |
+| Server | `update_ticket_status` | Close or reopen a ticket and return the update | Open a ticket and click its status control. |
+
+Client tools and Page Actions run in the browser and do not return results to
+the conversation. Server tools return data Nova can use in speech. After a
+server-side ticket change, `refresh_tickets` only refreshes the visible queue;
+Nova confirms the result returned by the server tool.
+
+Tool definitions live in [`lib/tools.ts`](./lib/tools.ts). Personality and the
+short opening live in [`lib/avatar.ts`](./lib/avatar.ts). The descriptions
+follow Runway’s guidance by saying when each tool should run and what it returns
+or changes:
 
 - [Client tools](https://docs.dev.runwayml.com/characters/tools/client-tools/)
-  and Page Actions run in the browser. They are fire-and-forget and do not
-  return a result to the conversation.
 - [Server tools](https://docs.dev.runwayml.com/characters/tools/server-tools/)
-  run through the one RPC handler. Their returned Convex data is available to
-  Nova, so she can speak it.
-- Tool descriptions and the personality use the narrow invocation guidance in
-  Runway’s [tool best practices](https://docs.dev.runwayml.com/characters/tools/best-practices/).
-
-Because client actions do not acknowledge completion, a cross-page demo uses
-short voice turns: first say “Open Revenue,” wait for the page, then ask the
-revenue question. Do not combine navigation, range changes, insight lookup, and
-another navigation into one mega command.
-
-## Complete tool inventory
-
-Everything Nova can do also has a normal clickable path. Stable
-`data-avatar-target` IDs are included because the visible labels may change.
-
-| Type | Tool | What Nova can do | Manual clickable equivalent |
-| --- | --- | --- | --- |
-| Page Action | `click` | Click a visible target | Click that same link, card, row, or button. The Overview showcase is `overview-page-actions`. |
-| Page Action | `scroll_to` | Bring a target into view | Click `overview-page-actions` to run the visible page-action preview, or use the target’s navigation link. |
-| Page Action | `highlight` | Pulse a visible target before a click | Click `overview-page-actions` for the same visible preview; every highlighted target remains directly clickable. |
-| Client | `set_date_range` | Change the visible Revenue chart range | Click `range-7d`, `range-30d`, or `range-90d`. |
-| Client | `filter_tickets` | Change the visible ticket queue to All, Open, or Billing | Click `ticket-filter-all`, `ticket-filter-open`, or `ticket-filter-billing`. |
-| Client | `open_panel` | Show a short on-screen information panel | Click `overview-open-panel`; KPI cards, anomalies, and ticket rows also open panels. |
-| Server | `get_overview_insights` | Return the live dashboard morning brief | Click `overview-insight`. |
-| Server | `get_revenue` | Return total, change, daily average, peak day, and refund insight for a range | Click `revenue-insight`; the range buttons and `revenue-anomaly` expose the same facts. |
-| Server | `get_ticket_insights` | Return queue totals, status split, team workload, and latest ticket | Click `tickets-insight`. |
-| Server | `get_ticket` | Look up one ticket by its numeric ID | Click `ticket-row-{ticketId}` in the Tickets table. |
-| Server | `create_ticket` | Create a real Convex ticket and return its ID | Click `new-ticket`, complete the form, then click `submit-ticket`. |
-| Server | `update_ticket_status` | Close or reopen a ticket and return its new status | Open `ticket-row-{ticketId}`, then click `ticket-status-{ticketId}`. |
-
-Tool definitions live in [`lib/tools.ts`](./lib/tools.ts). Session creation and
-all server handlers live in [`actions/avatar.ts`](./actions/avatar.ts).
-Personality and the short opening live in [`lib/avatar.ts`](./lib/avatar.ts).
+- [Tool best practices](https://docs.dev.runwayml.com/characters/tools/best-practices/)
 
 ## Voice and screen sharing
 
-Nova is an original support character. Her opening is intentionally short:
+Nova begins with a quick introduction:
 
-> Hi — how can I help?
+> Hi, I’m Nova. I can explore the dashboard, explain insights, and help with
+> tickets. Share your screen if you want help diagnosing what you see.
 
 The layout follows Runway’s
 [camera and screen-sharing guide](https://docs.dev.runwayml.com/characters/screens/).
-`video={false}` keeps the camera off when the call connects, while
-`showCamera={true}` leaves the standard camera control available. `<UserVideo />`
-and `<ScreenShareVideo />` display their respective feeds only while those
-tracks are active.
+The camera starts off, while the standard control bar exposes camera and screen
+sharing. `<UserVideo />` and `<ScreenShareVideo />` show the active feeds inside
+the full-height agent panel. The app uses the SDK’s media components and does
+not add custom media orchestration.
 
-Nova opens as a full-height right-side panel and can be minimized without
-unmounting an active call. The page animates to use the remaining width while
-the panel is open. The standard avatar video fills the tall panel and uses the
-SDK’s built-in cover crop, so the character gets more vertical camera space.
-
-The app relies on the hosted session and the SDK’s standard `ControlBar` for
-microphone, camera, and screen sharing. It does not add custom media handling.
-Share the current Northstar tab and wait for the control bar to show that
-sharing is active before continuing.
+Nova can be minimized without unmounting an active call. When open, the page
+animates to use the remaining width.
 
 ## Project structure
 
@@ -172,7 +174,8 @@ sharing is active before continuing.
 app/
   (dashboard)/             # one page per route
 actions/
-  avatar.ts                # one session action and all backend RPC handlers
+  avatar.ts                # one Runway session action and RPC handler
+  demo.ts                  # manual ticket actions
 components/
   agent/
   layout/
@@ -182,14 +185,13 @@ components/
   settings/
   tickets/
   ui/
+lib/
+  demo-data.ts             # deterministic fixtures and calculations
+  demo-store.ts            # shared in-memory ticket state
+  tools.ts                 # all 13 tool definitions
 ```
 
-Each feature component has its own file; page files do not contain nested
-component definitions.
-
-## Safe verification
-
-Automated checks must never create or consume a Runway session:
+## Token-free verification
 
 ```bash
 pnpm test
@@ -198,7 +200,8 @@ pnpm lint
 pnpm build
 ```
 
-The test suite mocks Runway and Convex. Do not call `createAvatarSession` from an
-integration test or browser automation; starting a real call is a manual demo
-step and consumes Characters credits. The Settings microphone test only checks
-browser permission and does not start a Runway session.
+The automated tests mock Runway session and RPC behavior. They never start a
+Character call or consume Runway credits. Starting a call is a manual demo step.
+The Settings microphone test only checks browser permission.
+
+For a recording-ready sequence, see [`DEMO.md`](./DEMO.md).

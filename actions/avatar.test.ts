@@ -4,8 +4,6 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   createRpcHandler: vi.fn(),
   consumeSession: vi.fn(),
-  query: vi.fn(),
-  mutation: vi.fn(),
   pollUntilReady: vi.fn(),
 }));
 
@@ -30,19 +28,15 @@ vi.mock("@runwayml/avatars-node-rpc", () => ({
   createRpcHandler: mocks.createRpcHandler,
 }));
 
-vi.mock("convex/browser", () => ({
-  ConvexHttpClient: class MockConvexHttpClient {
-    query = mocks.query;
-    mutation = mocks.mutation;
-  },
-}));
-
 import { createAvatarSession } from "@/actions/avatar";
+import { getTickets } from "@/actions/demo";
 import {
   NOVA_AVATAR_ID,
   NOVA_PERSONALITY,
   NOVA_START_SCRIPT,
 } from "@/lib/avatar";
+import { getDemoRevenue } from "@/lib/demo-data";
+import { resetDemoTickets } from "@/lib/demo-store";
 
 type RpcOptions = {
   sessionId: string;
@@ -63,9 +57,8 @@ describe("createAvatarSession", () => {
     mocks.create.mockReset();
     mocks.createRpcHandler.mockReset();
     mocks.consumeSession.mockReset();
-    mocks.query.mockReset();
-    mocks.mutation.mockReset();
     mocks.pollUntilReady.mockReset();
+    resetDemoTickets();
   });
 
   it("creates a session and connects its server tools", async () => {
@@ -84,37 +77,7 @@ describe("createAvatarSession", () => {
       token: "livekit-token",
       roomName: "room-123",
     });
-    const revenue = {
-      total: 122_926,
-      changePct: 3.3,
-      dailyAverage: 4_097.53,
-      peakDay: { date: "2026-07-20", amount: 5_120 },
-      refundCount: 1,
-      dip: { date: "2026-07-09", amount: -2_850 },
-    };
-    const ticket = {
-      ticketId: 4_806,
-      subject: "Investigate refund",
-      team: "Billing",
-      status: "open",
-      createdAt: 1,
-    };
-    const ticketInsights = {
-      total: 8,
-      open: 5,
-      closed: 3,
-      byTeam: [{ team: "Billing", count: 4 }],
-      topTeam: { team: "Billing", count: 4 },
-      latestTicket: ticket,
-    };
-    mocks.query.mockImplementation(async (_query, args) => {
-      if ("range" in args) return revenue;
-      if ("ticketId" in args) return ticket;
-      return ticketInsights;
-    });
-    mocks.mutation.mockImplementation(async (_mutation, args) =>
-      "status" in args ? { ...ticket, status: args.status } : 4_806,
-    );
+    const revenue = getDemoRevenue("30d");
 
     await expect(createAvatarSession()).resolves.toEqual({
       sessionId: "session-123",
@@ -139,6 +102,10 @@ describe("createAvatarSession", () => {
     expect(NOVA_PERSONALITY).toContain(
       "Never call a destination-page target in that same response.",
     );
+    expect(NOVA_PERSONALITY).toContain(
+      "sharing their screen can help you diagnose",
+    );
+    expect(NOVA_START_SCRIPT).toContain("Share your screen");
     expect(mocks.pollUntilReady).toHaveBeenCalledWith({
       sessionId: "session-123",
       apiKey: "mock-key",
@@ -152,44 +119,74 @@ describe("createAvatarSession", () => {
     await expect(
       rpcOptions!.tools.get_overview_insights(),
     ).resolves.toMatchObject({
-      revenue: { total: 122_926 },
-      support: { open: 5 },
+      revenue: {
+        total: revenue.total,
+        changePct: revenue.changePct,
+        refundCount: revenue.refundCount,
+      },
+      support: {
+        total: 10,
+        open: 7,
+        topTeam: { team: "Support", count: 3 },
+        latestTicket: { ticketId: 4_812 },
+      },
     });
     await expect(
       rpcOptions!.tools.get_revenue({ range: "30d" }),
     ).resolves.toMatchObject({
-      total: 122_926,
-      dailyAverage: 4_097.53,
-      refundCount: 1,
+      total: revenue.total,
+      changePct: revenue.changePct,
+      dailyAverage: revenue.dailyAverage,
+      peakDay: revenue.peakDay,
+      refundCount: revenue.refundCount,
+      dip: revenue.dip,
     });
-    await expect(rpcOptions!.tools.get_ticket_insights()).resolves.toEqual(
-      ticketInsights,
-    );
+    await expect(
+      rpcOptions!.tools.get_ticket_insights(),
+    ).resolves.toMatchObject({
+      total: 10,
+      open: 7,
+      closed: 3,
+      topTeam: { team: "Support", count: 3 },
+      latestTicket: { ticketId: 4_812 },
+    });
     await expect(
       rpcOptions!.tools.get_ticket({ ticketId: 4_806 }),
-    ).resolves.toEqual({ ticket });
-    await expect(
-      rpcOptions!.tools.create_ticket({
-        subject: "Investigate refund",
-        team: "Billing",
-      }),
-    ).resolves.toEqual({ ticketId: 4_806 });
-    await expect(
-      rpcOptions!.tools.update_ticket_status({
+    ).resolves.toMatchObject({
+      ticket: {
         ticketId: 4_806,
+        subject: "Password reset link expires immediately",
+        team: "Support",
         status: "closed",
-      }),
-    ).resolves.toMatchObject({ ticketId: 4_806, status: "closed" });
-    expect(mocks.query).toHaveBeenCalledWith(expect.anything(), { range: "30d" });
-    expect(mocks.query).toHaveBeenCalledWith(expect.anything(), {
-      ticketId: 4_806,
+      },
     });
-    expect(mocks.mutation).toHaveBeenCalledWith(expect.anything(), {
+    const created = await rpcOptions!.tools.create_ticket({
       subject: "Investigate refund",
       team: "Billing",
     });
-    expect(mocks.mutation).toHaveBeenCalledWith(expect.anything(), {
-      ticketId: 4_806,
+    expect(created).toMatchObject({
+      ticket: {
+        ticketId: 4_813,
+        subject: "Investigate refund",
+        team: "Billing",
+        status: "open",
+      },
+    });
+    await expect(getTickets()).resolves.toContainEqual(
+      expect.objectContaining({
+        ticketId: 4_813,
+        subject: "Investigate refund",
+      }),
+    );
+    await expect(
+      rpcOptions!.tools.update_ticket_status({
+        ticketId: 4_813,
+        status: "closed",
+      }),
+    ).resolves.toMatchObject({
+      ticketId: 4_813,
+      subject: "Investigate refund",
+      team: "Billing",
       status: "closed",
     });
     expect(mocks.consumeSession).toHaveBeenCalledWith({

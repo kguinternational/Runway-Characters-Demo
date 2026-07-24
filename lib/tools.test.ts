@@ -4,13 +4,14 @@ import { describe, expect, it } from "vitest";
 import {
   filterTicketsTool,
   openPanelTool,
+  refreshTicketsTool,
   sessionTools,
   setDateRangeTool,
 } from "@/lib/tools";
 
 describe("Nova tool contract", () => {
   it("keeps the demo below Runway's 20-tool session limit", () => {
-    expect(sessionTools).toHaveLength(12);
+    expect(sessionTools).toHaveLength(13);
   });
 
   it("includes all three Page Actions with model-facing targets", () => {
@@ -60,9 +61,17 @@ describe("Nova tool contract", () => {
       name: "filter",
       enum: ["all", "open", "billing"],
     });
+
+    expect(validateClientToolArgs(refreshTicketsTool, {})).toEqual({});
+    expect(
+      sessionTools.find((tool) => tool.name === "refresh_tickets"),
+    ).toMatchObject({
+      type: "client_event",
+      name: "refresh_tickets",
+    });
   });
 
-  it("declares every database-backed capability with a bounded timeout", () => {
+  it("declares every local-data server capability with a bounded timeout", () => {
     for (const name of [
       "get_overview_insights",
       "get_revenue",

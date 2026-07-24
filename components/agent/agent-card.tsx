@@ -108,14 +108,14 @@ export function AgentCard({
                 endCall(session.sessionId);
               }}
             >
-              <AvatarVideo />
-              <UserVideo />
+              <AvatarVideo className="!absolute inset-0" />
+              <ScreenShareVideo className="!absolute bottom-32 left-4 aspect-video !h-auto !w-[55%] overflow-hidden rounded-lg" />
+              <UserVideo className="!bottom-32" />
               <PageActions
                 highlightDuration={3000}
                 scrollBehavior="smooth"
                 scrollBlock="center"
               />
-              <ScreenShareVideo />
               <ControlBar showCamera={true} showScreenShare />
               <ClientToolHandlers />
             </AvatarCall>
@@ -144,7 +144,7 @@ export function AgentCard({
                   What Nova can do
                 </p>
                 <p className="mt-2 text-xs leading-5 text-white/62">
-                  Navigate and highlight the UI, show live dashboard insights,
+                  Navigate and highlight the UI, show demo dashboard insights,
                   change revenue ranges, filter tickets, open panels, and
                   create or update tickets.
                 </p>

@@ -1,63 +1,60 @@
 # Recording runbook
 
-This sequence shows every useful tool class in about three minutes without one
-fragile, cross-page mega command.
+This local sequence demonstrates all three Runway tool types, the shared manual
+controls, screen sharing, and the in-memory ticket flow in about three minutes.
 
 ## Before the call
 
-1. Run `pnpm demo` and open [http://localhost:3000](http://localhost:3000).
+1. Run `pnpm dev` and open [http://localhost:3000](http://localhost:3000).
 2. Open `/settings` and click **Test microphone**. This checks browser
-   permission without starting a Runway session or spending Characters credits.
+   permission without starting a Runway session.
 3. Return to `/`, choose light mode, and close any open panel.
-4. Click **Start call** and wait for Nova to appear. This is the only
-   credit-consuming step in the runbook.
-5. The camera control is available but the camera starts off. Leave it off for
-   this screen-sharing flow.
-6. In Runway’s standard control bar, click the screen button, choose the current
-   Northstar tab, and wait for the sharing indicator. The mounted screen-share
-   view appears only while that track is active.
+4. Click **Start call** and wait for Nova to appear. Starting a call consumes
+   Characters credits; the automated checks do not.
+5. The camera starts off. Turn it on only if you want to demonstrate
+   `<UserVideo />`.
+6. To share, use Runway’s standard screen button, choose the Northstar tab, and
+   wait for the sharing indicator. The screen and camera previews appear inside
+   the agent panel while their tracks are active.
 
-Nova’s opening is only:
+Nova’s quick opening is:
 
-> Hi — how can I help?
+> Hi, I’m Nova. I can explore the dashboard, explain insights, and help with
+> tickets. Share your screen if you want help diagnosing what you see.
 
-Say each prompt separately and wait for its speech or visible action before
-continuing. Client tools and Page Actions are fire-and-forget browser events, so
-they do not return a completion result to the conversation. Short turns give a
-new route time to render and let server tools provide the facts Nova speaks.
+Use short prompts and wait for the speech or visible action before continuing.
+Page Actions and client tools change the browser but do not return a result to
+the conversation. Server tools return the demo facts Nova speaks.
 
 ## Recording sequence
 
-### 1. Live dashboard morning brief
+### 1. Overview insight
 
 Say:
 
-> Give me the morning brief for this dashboard. Include revenue movement,
-> refunds, open tickets, and the busiest support team.
+> Give me a quick overview. Include revenue movement, the refund, open tickets,
+> and the busiest team.
 
 Expected:
 
-- `get_overview_insights` reads current Convex data;
-- Nova speaks a concise brief using the returned values;
-- she does not estimate from the cards.
+- `get_overview_insights` returns facts calculated from the bundled revenue and
+  current in-memory tickets;
+- Nova gives a concise spoken brief instead of estimating from the cards.
 
-Manual equivalent: click the Overview insight control
-(`overview-insight`).
+Manual equivalent: click **Overview insight**.
 
 Then say:
 
-> Put that brief on screen.
+> Put that summary on screen.
 
 Expected:
 
 - Nova gives a short lead-in;
-- `open_panel` opens a visible summary panel;
-- the panel is a browser event, not another database lookup.
+- `open_panel` opens the centered information modal.
 
-Manual equivalent: click the dashboard detail control
-(`overview-open-panel`).
+Manual equivalent: click **Open an insight panel** or any clickable KPI.
 
-### 2. Page Actions and Revenue navigation
+### 2. Page Actions and navigation
 
 Say:
 
@@ -65,11 +62,12 @@ Say:
 
 Expected:
 
-- Nova briefly explains the visible action;
-- `highlight` identifies `overview-page-actions`;
-- `click` activates it and `scroll_to` brings the target section into view.
+- Nova briefly explains the action;
+- `highlight` pulses the Page Actions card;
+- `scroll_to` brings it into view;
+- `click` activates the preview.
 
-Manual equivalent: click `overview-page-actions`.
+Manual equivalent: click the **Preview page actions** card.
 
 Now say only:
 
@@ -78,46 +76,42 @@ Now say only:
 Expected:
 
 - Nova says she is opening Revenue;
-- Page Actions highlight and click the Revenue navigation target;
-- the route changes to `/revenue`;
-- Nova does not attempt destination-page tools before the route has rendered.
+- the navigation target highlights before it is clicked;
+- the route changes to `/revenue`.
 
 Manual equivalent: click **Revenue** in the sidebar.
 
-After Revenue is visible, say:
+### 3. Revenue range and insight
+
+After the Revenue page is visible, say:
 
 > Show me 30 days.
 
-Expected:
+Expected: `set_date_range` selects the 30-day view.
 
-- `set_date_range` selects the 30-day view;
-- the chart and summary update in the browser.
-
-Manual equivalent: click `range-30d`.
+Manual equivalent: click **30 days**.
 
 Then say:
 
-> For this 30-day view, give me total revenue, daily average, peak day, and the
-> refund insight.
+> For this range, give me the total, change, daily average, peak day, and refund
+> insight.
 
 Expected:
 
-- `get_revenue` reads the selected range from Convex;
-- Nova speaks the returned total, comparison, daily average, peak, and refund;
-- the answer is based on server data, not chart estimation.
+- `get_revenue` returns the deterministic 30-day calculation;
+- Nova speaks the returned figures and does not infer them from the chart.
 
-Manual equivalent: click `revenue-insight`. The same page also exposes
-`range-7d`, `range-30d`, `range-90d`, and `revenue-anomaly`.
+Manual equivalent: click **Revenue insight**.
 
-For one more visible action, say:
+Then say:
 
 > Highlight and open the refund anomaly.
 
-Expected: Nova speaks first, then highlights and clicks `revenue-anomaly`.
+Expected: Nova speaks, highlights the anomaly, and clicks it.
 
-Manual equivalent: click the refund anomaly on the chart.
+Manual equivalent: click the refund row beneath the chart.
 
-### 3. Support workload and exact ticket lookup
+### 4. Ticket workload and filtering
 
 Say only:
 
@@ -125,62 +119,58 @@ Say only:
 
 Wait for `/tickets`, then say:
 
-> How is the support workload split by status and team? Include the busiest
-> team and latest ticket.
+> How is the queue split by status and team? Include the busiest team and latest
+> ticket.
 
-Expected:
+Expected: `get_ticket_insights` returns the current in-memory queue summary for
+Nova to speak.
 
-- `get_ticket_insights` returns the live open/closed split and team counts;
-- Nova speaks the workload insight.
-
-Manual equivalent: click `tickets-insight`; the **All**, **Open**, and
-**Billing** filters expose the queue directly.
+Manual equivalent: click **Queue insight**.
 
 Then say:
 
-> Show only the open tickets.
+> Show only open tickets.
 
-Expected:
+Expected: `filter_tickets` selects the visible Open view.
 
-- `filter_tickets` switches the visible queue to Open;
-- Nova briefly describes the view without claiming a server result.
-
-Manual equivalent: click `ticket-filter-open`. Click `ticket-filter-all` to
-restore the full queue.
+Manual equivalent: click **Open**. The **All** and **Billing** controls expose
+the other views.
 
 Then say:
 
-> Look up ticket 4801 and tell me its subject, team, and status.
+> Look up ticket 4803 and tell me its subject, team, and status.
 
-Expected:
+Expected: `get_ticket` returns ticket `4803`, and Nova speaks that exact record.
 
-- `get_ticket` returns exactly ticket `4801`;
-- Nova speaks the returned record rather than choosing a nearby row.
+Manual equivalent: click the row for ticket `4803`.
 
-Manual equivalent: click `ticket-row-4801`.
-
-### 4. Close and reopen a real ticket
+### 5. Update and refresh a ticket
 
 Say:
 
-> Close ticket 4801.
+> Close ticket 4803.
 
 Expected:
 
-- `update_ticket_status` writes `closed` to Convex;
-- Nova confirms the returned ticket ID and new status;
-- the row updates reactively.
+- `update_ticket_status` changes the in-memory record and returns the updated
+  ticket;
+- Nova confirms the returned ID and status;
+- `refresh_tickets` reloads the visible queue.
 
-Then restore the demo state:
+Manual equivalent: open ticket `4803`, click its status control, then click
+**Refresh** if needed.
 
-> Reopen ticket 4801.
+Restore the starting state:
 
-Expected: the same tool returns and speaks the new `open` status.
+> Reopen ticket 4803.
 
-Manual equivalent for either change: open `ticket-row-4801`, then click
-`ticket-status-4801`.
+Expected: the same server tool returns the open record, followed by the browser
+refresh.
 
-### 5. Create a real support ticket
+The queue is intentionally refreshed after a change; it is not presented as an
+automatic external-data update.
+
+### 6. Create and display a ticket
 
 Say:
 
@@ -188,20 +178,20 @@ Say:
 
 Expected:
 
-- `create_ticket` writes a real Convex ticket;
-- Nova speaks the returned ticket ID;
-- the new ticket appears in the table.
+- `create_ticket` adds a ticket to server memory and returns the new record;
+- Nova speaks the new ticket ID;
+- `refresh_tickets` reloads the visible queue so the row appears.
 
-Manual equivalent: click `new-ticket`, complete the form, then click
-`submit-ticket`.
+Manual equivalent: click **New ticket**, complete the form, submit it, and use
+**Refresh** to reload the queue.
 
-### 6. Finish with a visible theme action
+### 7. Finish with another visible action
 
 Say:
 
 > Switch to dark mode.
 
-Expected: Nova speaks first, then highlights and clicks `theme-toggle`.
+Expected: Nova speaks first, then highlights and clicks the theme control.
 
 Manual equivalent: click the theme button in the top bar.
 
@@ -214,14 +204,15 @@ Use this rhythm when improvising:
 3. Change one visible control: “Show me 90 days.”
 4. Ask one data question: “What changed, and where is the peak?”
 
-Avoid:
+Avoid combining several page changes and questions into one command. Browser
+actions do not report completion back to the conversation, so separate turns
+give the next page time to render.
 
-> Open Revenue, switch to 90 days, inspect the refund, open Tickets, create a
-> ticket, and change the theme.
+## Resetting the demo
 
-That asks fire-and-forget client actions to coordinate across route renders.
-Runway’s documented contract does not send those browser results back to the
-conversation.
+Revenue fixtures are deterministic and do not change. Ticket changes stay in
+memory for the life of the Next.js server. Stop and restart `pnpm dev` to restore
+the original ticket seed before another recording.
 
 ## If Nova cannot hear or respond
 
@@ -229,9 +220,9 @@ conversation.
 - Confirm the browser granted microphone permission.
 - Wait for the current short response before issuing the next prompt.
 - If a one-use session disconnects, end it and start a fresh call.
-- If a server insight does not produce speech, inspect the local terminal for an
-  RPC error; server tools should either return data or return an error to Nova.
+- If a server insight does not produce speech, inspect the local terminal for
+  an RPC error.
 
-The app relies on the hosted Runway session and standard SDK controls for
-microphone and interruption behavior. It does not add custom audio, camera, or
-screen-share orchestration.
+The app uses Runway’s hosted session and standard SDK controls for microphone,
+camera, interruption, and screen sharing. It does not add custom media
+orchestration.

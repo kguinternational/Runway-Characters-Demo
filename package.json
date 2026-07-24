@@ -4,16 +4,13 @@
   "private": true,
   "packageManager": "pnpm@11.15.1",
   "scripts": {
-    "demo": "convex dev --once --run seed:seedDemo && convex dev --start \"pnpm run dev\"",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "convex:dev": "convex dev",
-    "convex:seed": "convex run seed:seedDemo"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@runwayml/avatars-node-rpc": "^0.1.0",
@@ -22,7 +19,6 @@
     "@tailwindcss/postcss": "^4.3.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "convex": "^1.42.1",
     "lucide-react": "^0.468.0",
     "next": "16.2.11",
     "next-themes": "^0.4.6",

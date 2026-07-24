@@ -27,11 +27,17 @@ vi.mock("@runwayml/avatars-react", () => ({
       <button onClick={onEnd}>Hang up</button>
     </div>
   ),
-  AvatarVideo: () => null,
+  AvatarVideo: ({ className }: { className?: string }) => (
+    <div className={className} data-testid="avatar-video" />
+  ),
   ControlBar: () => null,
   PageActions: () => null,
-  ScreenShareVideo: () => null,
-  UserVideo: () => null,
+  ScreenShareVideo: ({ className }: { className?: string }) => (
+    <div className={className} data-testid="screen-share-video" />
+  ),
+  UserVideo: ({ className }: { className?: string }) => (
+    <div className={className} data-testid="user-video" />
+  ),
 }));
 
 const firstSession = {
@@ -58,6 +64,18 @@ describe("AgentCard", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Start call" }));
     expect(await screen.findByTestId("call-session-1")).toBeInTheDocument();
+    expect(screen.getByTestId("avatar-video")).toHaveClass(
+      "!absolute",
+      "inset-0",
+    );
+    expect(screen.getByTestId("screen-share-video")).toHaveClass(
+      "!absolute",
+      "bottom-32",
+      "left-4",
+      "aspect-video",
+      "!w-[55%]",
+    );
+    expect(screen.getByTestId("user-video")).toHaveClass("!bottom-32");
 
     fireEvent.click(screen.getByRole("button", { name: "Hang up" }));
     await waitFor(() =>

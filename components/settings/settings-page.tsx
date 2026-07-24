@@ -146,7 +146,7 @@ export function SettingsPage() {
             onClick={() =>
               openPanel({
                 title: "Nova Support",
-                body: "An original Runway-generated support specialist with a six-word greeting and concise response instructions.",
+                body: "An original Runway-generated support specialist with a brief greeting and concise response instructions.",
               })
             }
           >
@@ -199,7 +199,7 @@ export function SettingsPage() {
             onClick={() =>
               openPanel({
                 title: "Connections ready",
-                body: "Convex is reactive. Runway creates a fresh five-minute session only when you start a call.",
+                body: "Local demo data is ready. Ticket changes reset when the dev server restarts, and Runway creates a fresh five-minute session only when you start a call.",
               })
             }
           >
