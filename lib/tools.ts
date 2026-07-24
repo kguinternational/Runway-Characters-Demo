@@ -2,8 +2,6 @@ import { clientTool, pageActionTools } from "@runwayml/avatars-react/api";
 import type { RealtimeSessionCreateParams } from "@runwayml/sdk/resources/realtime-sessions";
 import { z } from "zod";
 
-type SessionTools = NonNullable<RealtimeSessionCreateParams["tools"]>;
-
 export const setDateRangeTool = clientTool("set_date_range", {
   description: "Change the visible range on the Revenue page.",
   schema: z.object({ range: z.enum(["7d", "30d", "90d"]) }),
@@ -18,7 +16,8 @@ export const openPanelTool = clientTool("open_panel", {
 });
 
 // Zod validates browser events. Parameters tell the model what arguments to send.
-const clientTools: SessionTools = [
+export const sessionTools = [
+  ...pageActionTools,
   {
     ...setDateRangeTool,
     parameters: [
@@ -37,9 +36,6 @@ const clientTools: SessionTools = [
       { name: "body", type: "string", description: "Short panel message." },
     ],
   },
-];
-
-const serverTools: SessionTools = [
   {
     type: "backend_rpc",
     name: "get_revenue",
@@ -71,10 +67,4 @@ const serverTools: SessionTools = [
       },
     ],
   },
-];
-
-export const sessionTools = [
-  ...pageActionTools,
-  ...clientTools,
-  ...serverTools,
-] as SessionTools;
+] as NonNullable<RealtimeSessionCreateParams["tools"]>;
