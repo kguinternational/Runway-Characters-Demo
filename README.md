@@ -7,31 +7,58 @@ visible controls, explain live Convex data, and manage support tickets.
 The integration deliberately stays close to Runway’s official examples:
 
 ```tsx
+"use client";
+
+import { useState } from "react";
+
 import {
   AvatarCall,
   AvatarVideo,
   ControlBar,
   PageActions,
   ScreenShareVideo,
+  type SessionCredentials,
   UserVideo,
 } from "@runwayml/avatars-react";
 
-<AvatarCall
-  avatarId={NOVA_AVATAR_ID}
-  connect={createAvatarSession}
-  video={false}
->
-  <AvatarVideo />
-  <UserVideo />
-  <ScreenShareVideo />
-  <ControlBar showCamera={true} showScreenShare />
-  <PageActions />
-</AvatarCall>
+import { createAvatarSession } from "@/actions/avatar";
+import { NOVA_AVATAR_ID } from "@/lib/avatar";
+
+function NovaCall() {
+  const [session, setSession] = useState<SessionCredentials | null>(null);
+
+  if (!session) {
+    return (
+      <button onClick={async () => setSession(await createAvatarSession())}>
+        Start call
+      </button>
+    );
+  }
+
+  return (
+    <AvatarCall
+      key={session.sessionId}
+      avatarId={NOVA_AVATAR_ID}
+      credentials={session}
+      video={false}
+      onEnd={() => setSession(null)}
+      className="h-full !aspect-auto"
+    >
+      <AvatarVideo />
+      <UserVideo />
+      <ScreenShareVideo />
+      <ControlBar showCamera={true} showScreenShare />
+      <PageActions highlightDuration={3000} scrollBlock="center" />
+    </AvatarCall>
+  );
+}
 ```
 
 The single [Next.js Server Action](./actions/avatar.ts) creates and consumes a
 fresh session and attaches Runway’s `createRpcHandler`. There is no API route,
-custom RPC bridge, or second session endpoint.
+custom RPC bridge, or second session endpoint. Every Start click fetches fresh
+one-use credentials, so hanging up and starting a second call does not reuse the
+first session.
 
 ## Run locally
 
@@ -103,6 +130,7 @@ Everything Nova can do also has a normal clickable path. Stable
 | Page Action | `scroll_to` | Bring a target into view | Click `overview-page-actions` to run the visible page-action preview, or use the target’s navigation link. |
 | Page Action | `highlight` | Pulse a visible target before a click | Click `overview-page-actions` for the same visible preview; every highlighted target remains directly clickable. |
 | Client | `set_date_range` | Change the visible Revenue chart range | Click `range-7d`, `range-30d`, or `range-90d`. |
+| Client | `filter_tickets` | Change the visible ticket queue to All, Open, or Billing | Click `ticket-filter-all`, `ticket-filter-open`, or `ticket-filter-billing`. |
 | Client | `open_panel` | Show a short on-screen information panel | Click `overview-open-panel`; KPI cards, anomalies, and ticket rows also open panels. |
 | Server | `get_overview_insights` | Return the live dashboard morning brief | Click `overview-insight`. |
 | Server | `get_revenue` | Return total, change, daily average, peak day, and refund insight for a range | Click `revenue-insight`; the range buttons and `revenue-anomaly` expose the same facts. |
@@ -129,7 +157,9 @@ and `<ScreenShareVideo />` display their respective feeds only while those
 tracks are active.
 
 Nova opens as a full-height right-side panel and can be minimized without
-unmounting an active call.
+unmounting an active call. The page animates to use the remaining width while
+the panel is open. The standard avatar video fills the tall panel and uses the
+SDK’s built-in cover crop, so the character gets more vertical camera space.
 
 The app relies on the hosted session and the SDK’s standard `ControlBar` for
 microphone, camera, and screen sharing. It does not add custom media handling.

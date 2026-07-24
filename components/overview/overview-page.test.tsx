@@ -29,6 +29,8 @@ describe("Overview capability map", () => {
     vi.mocked(useDashboard).mockReturnValue({
       range: "30d",
       setRange: vi.fn(),
+      ticketFilter: "all",
+      setTicketFilter: vi.fn(),
       panel: null,
       openPanel,
       closePanel: vi.fn(),
@@ -48,7 +50,7 @@ describe("Overview capability map", () => {
     for (const label of [
       "get_overview_insights",
       "get_revenue · set_date_range",
-      "get_ticket_insights · get_ticket · update_ticket_status",
+      "get_ticket_insights · get_ticket · filter_tickets · update_ticket_status",
       "create_ticket",
       "open_panel",
       "click · scroll_to · highlight",

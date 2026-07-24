@@ -138,6 +138,18 @@ Manual equivalent: click `tickets-insight`; the **All**, **Open**, and
 
 Then say:
 
+> Show only the open tickets.
+
+Expected:
+
+- `filter_tickets` switches the visible queue to Open;
+- Nova briefly describes the view without claiming a server result.
+
+Manual equivalent: click `ticket-filter-open`. Click `ticket-filter-all` to
+restore the full queue.
+
+Then say:
+
 > Look up ticket 4801 and tell me its subject, team, and status.
 
 Expected:

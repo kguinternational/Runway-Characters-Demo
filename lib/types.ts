@@ -1,4 +1,5 @@
 export type RevenueRange = "7d" | "30d" | "90d";
+export type TicketFilter = "all" | "open" | "billing";
 
 export interface RevenuePoint {
   date: string;

@@ -191,7 +191,8 @@ export function OverviewPage() {
                 Inspect and update the queue
               </span>
               <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
-                get_ticket_insights · get_ticket · update_ticket_status
+                get_ticket_insights · get_ticket · filter_tickets ·
+                update_ticket_status
               </span>
             </Link>
             <Link

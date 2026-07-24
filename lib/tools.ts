@@ -17,6 +17,12 @@ export const openPanelTool = clientTool("open_panel", {
   }),
 });
 
+export const filterTicketsTool = clientTool("filter_tickets", {
+  description:
+    "Change the visible Tickets view to All, Open, or Billing only when the user asks to filter the ticket queue. This browser action returns no data.",
+  schema: z.object({ filter: z.enum(["all", "open", "billing"]) }),
+});
+
 export const sessionTools = [
   ...pageActionTools,
   {
@@ -42,6 +48,17 @@ export const sessionTools = [
         name: "body",
         type: "string",
         description: "A concise insight or explanation to show in the panel.",
+      },
+    ],
+  },
+  {
+    ...filterTicketsTool,
+    parameters: [
+      {
+        name: "filter",
+        type: "string",
+        enum: ["all", "open", "billing"],
+        description: "The visible ticket view: all, open, or billing.",
       },
     ],
   },

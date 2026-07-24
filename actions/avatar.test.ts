@@ -133,8 +133,9 @@ describe("createAvatarSession", () => {
       }),
     );
     expect(NOVA_PERSONALITY).toContain(
-      "Before every click, call highlight with the exact target",
+      "call scroll_to first, then call highlight",
     );
+    expect(NOVA_PERSONALITY).toContain("Use filter_tickets only");
     expect(NOVA_PERSONALITY).toContain(
       "Never call a destination-page target in that same response.",
     );

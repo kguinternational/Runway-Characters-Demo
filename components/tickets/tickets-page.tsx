@@ -12,18 +12,15 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
-type Filter = "all" | "open" | "billing";
-
 export function TicketsPage() {
-  const { openPanel } = useDashboard();
+  const { openPanel, ticketFilter, setTicketFilter } = useDashboard();
   const tickets = useQuery(api.tickets.listRecent, { limit: 30 });
   const ticketInsights = useQuery(api.tickets.getInsights);
   const updateStatus = useMutation(api.tickets.updateStatus);
-  const [filter, setFilter] = useState<Filter>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const filteredTickets = tickets?.filter((ticket) => {
-    if (filter === "open") return ticket.status === "open";
-    if (filter === "billing") return ticket.team === "Billing";
+    if (ticketFilter === "open") return ticket.status === "open";
+    if (ticketFilter === "billing") return ticket.team === "Billing";
     return true;
   });
   const queueInsight = ticketInsights
@@ -57,13 +54,14 @@ export function TicketsPage() {
               key={value}
               id={`ticket-filter-${value}`}
               data-avatar-target={`ticket-filter-${value}`}
+              aria-pressed={ticketFilter === value}
               className={cn(
                 "rounded-full px-4 py-2 text-xs font-semibold capitalize",
-                filter === value
+                ticketFilter === value
                   ? "bg-[var(--ink)] text-[var(--paper)]"
                   : "text-[var(--muted)] hover:bg-[var(--surface-raised)]",
               )}
-              onClick={() => setFilter(value)}
+              onClick={() => setTicketFilter(value)}
             >
               {value}
             </button>

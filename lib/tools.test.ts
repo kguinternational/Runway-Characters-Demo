@@ -2,6 +2,7 @@ import { validateClientToolArgs } from "@runwayml/avatars-react/api";
 import { describe, expect, it } from "vitest";
 
 import {
+  filterTicketsTool,
   openPanelTool,
   sessionTools,
   setDateRangeTool,
@@ -9,7 +10,7 @@ import {
 
 describe("Nova tool contract", () => {
   it("keeps the demo below Runway's 20-tool session limit", () => {
-    expect(sessionTools).toHaveLength(11);
+    expect(sessionTools).toHaveLength(12);
   });
 
   it("includes all three Page Actions with model-facing targets", () => {
@@ -44,6 +45,21 @@ describe("Nova tool contract", () => {
       body: "Revenue is up.",
     });
     expect(validateClientToolArgs(openPanelTool, { title: "Missing body" })).toBeNull();
+
+    expect(
+      validateClientToolArgs(filterTicketsTool, { filter: "billing" }),
+    ).toEqual({ filter: "billing" });
+    expect(
+      validateClientToolArgs(filterTicketsTool, { filter: "product" }),
+    ).toBeNull();
+
+    const filterTool = sessionTools.find(
+      (tool) => tool.name === "filter_tickets",
+    );
+    expect(filterTool?.parameters?.[0]).toMatchObject({
+      name: "filter",
+      enum: ["all", "open", "billing"],
+    });
   });
 
   it("declares every database-backed capability with a bounded timeout", () => {

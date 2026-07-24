@@ -22,21 +22,27 @@ export function InfoPanel({
         tabIndex={panel ? 0 : -1}
         onClick={onClose}
         className={cn(
-          "fixed inset-0 z-20 bg-[#090c0b]/20 backdrop-blur-[1px] transition-opacity",
+          "fixed inset-0 z-[60] bg-[#090c0b]/40 backdrop-blur-[2px] transition-opacity duration-200",
           panel ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0",
         )}
       />
       <aside
         id="info-panel"
         data-avatar-target="info-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="info-panel-title"
         aria-hidden={!panel}
+        inert={!panel}
         className={cn(
-          "fixed right-3 top-20 z-[45] w-[calc(100%-1.5rem)] max-w-[390px] rounded-[1.6rem] border border-white/10 bg-[#111615] p-6 text-[#f5f3e9] shadow-[-20px_24px_80px_rgba(5,8,7,0.3)] transition-transform sm:right-5 lg:right-[390px]",
-          panel ? "translate-x-0" : "translate-x-[115%] lg:translate-x-[210%]",
+          "fixed left-1/2 top-1/2 z-[61] w-[calc(100%-2rem)] max-w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-[1.75rem] border border-[var(--line)] bg-[var(--surface)] p-6 text-[var(--ink)] shadow-[0_30px_100px_rgba(5,8,7,0.35)] transition duration-200 ease-out motion-reduce:transition-none sm:p-7",
+          panel
+            ? "scale-100 opacity-100"
+            : "pointer-events-none scale-95 opacity-0",
         )}
       >
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[0.66rem] uppercase tracking-[0.18em] text-[#aab3ae]">
+          <span className="font-mono text-[0.66rem] uppercase tracking-[0.18em] text-[var(--muted)]">
             Dashboard detail
           </span>
           <Button
@@ -44,7 +50,7 @@ export function InfoPanel({
             data-avatar-target="close-info-panel"
             variant="ghost"
             size="icon"
-            className="text-[#aab3ae] hover:bg-white/10 hover:text-white"
+            className="text-[var(--muted)] hover:bg-[var(--surface-raised)] hover:text-[var(--ink)]"
             onClick={onClose}
             tabIndex={panel ? 0 : -1}
             aria-label="Close panel"
@@ -52,11 +58,16 @@ export function InfoPanel({
             <X className="size-4" />
           </Button>
         </div>
-        <CheckCircle2 className="mt-8 size-10 text-[var(--accent)]" />
-        <h2 className="mt-5 text-3xl font-semibold tracking-[-0.05em]">
+        <div className="mt-6 grid size-11 place-items-center rounded-2xl bg-[var(--positive-soft)]">
+          <CheckCircle2 className="size-5 text-[var(--positive)]" />
+        </div>
+        <h2
+          id="info-panel-title"
+          className="mt-5 text-3xl font-semibold tracking-[-0.05em]"
+        >
           {panel?.title ?? "Details"}
         </h2>
-        <p className="mt-4 text-[1rem] leading-7 text-[#b7c0bb]">
+        <p className="mt-3 text-[0.95rem] leading-7 text-[var(--muted)]">
           {panel?.body ?? ""}
         </p>
       </aside>
