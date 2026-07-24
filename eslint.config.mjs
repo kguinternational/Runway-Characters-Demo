@@ -7,6 +7,7 @@ const config = defineConfig([
   ...nextTypescript,
   globalIgnores([
     ".next/**",
+    ".vercel/**",
     "node_modules/**",
     "convex/_generated/**",
     ".agents/**",
