@@ -76,7 +76,9 @@ opening is:
 > Hi — how can I help?
 
 Runway handles barge-in automatically when the microphone is live. The demo uses
-the SDK’s standard `ControlBar` for microphone and screen-share controls.
+the SDK’s standard `ControlBar` for microphone and screen-share controls. The
+Share screen & call button uses the documented `getDisplayMedia({ video: true })`
+and `initialScreenStream` flow.
 
 ## Project structure
 
