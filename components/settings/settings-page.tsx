@@ -171,7 +171,7 @@ export function SettingsPage() {
               data-avatar-target="settings-microphone"
               variant="outline"
               disabled={testingMic}
-              onClick={() => void testMicrophone()}
+              onClick={testMicrophone}
             >
               <Mic2 className="size-4" />
               Test microphone

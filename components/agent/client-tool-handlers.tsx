@@ -17,5 +17,5 @@ export function ClientToolHandlers() {
 
   useClientEvent(openPanelTool, openPanel);
 
-  return <PageActions highlightDuration={2_500} scrollBlock="center" />;
+  return <PageActions />;
 }

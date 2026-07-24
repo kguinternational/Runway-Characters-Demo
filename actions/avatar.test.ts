@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   create: vi.fn(),
+  createRpcHandler: vi.fn(),
   consumeSession: vi.fn(),
+  query: vi.fn(),
+  mutation: vi.fn(),
   pollUntilReady: vi.fn(),
 }));
 
@@ -23,28 +26,62 @@ vi.mock("@runwayml/avatars-react/api", async (importOriginal) => {
   };
 });
 
-import { createAvatarSession } from "@/app/avatar-actions";
+vi.mock("@runwayml/avatars-node-rpc", () => ({
+  createRpcHandler: mocks.createRpcHandler,
+}));
+
+vi.mock("convex/browser", () => ({
+  ConvexHttpClient: class MockConvexHttpClient {
+    query = mocks.query;
+    mutation = mocks.mutation;
+  },
+}));
+
+import { createAvatarSession } from "@/actions/avatar";
 import { NOVA_PERSONALITY, NOVA_START_SCRIPT } from "@/lib/avatar";
+
+type RpcOptions = {
+  sessionId: string;
+  onDisconnected: () => void;
+  tools: {
+    get_revenue: (args: Record<string, unknown>) => Promise<unknown>;
+    create_ticket: (args: Record<string, unknown>) => Promise<unknown>;
+  };
+};
 
 describe("createAvatarSession", () => {
   beforeEach(() => {
     vi.stubEnv("RUNWAYML_API_SECRET", "mock-key");
     mocks.create.mockReset();
+    mocks.createRpcHandler.mockReset();
     mocks.consumeSession.mockReset();
+    mocks.query.mockReset();
+    mocks.mutation.mockReset();
     mocks.pollUntilReady.mockReset();
   });
 
-  it("creates and consumes the custom avatar session on the server", async () => {
+  it("creates a session and connects its server tools", async () => {
+    let rpcOptions: RpcOptions | undefined;
     mocks.create.mockResolvedValue({ id: "session-123" });
     mocks.pollUntilReady.mockResolvedValue({
       sessionId: "session-123",
       sessionKey: "session-key",
+    });
+    mocks.createRpcHandler.mockImplementation(async (options: RpcOptions) => {
+      rpcOptions = options;
+      return { close: vi.fn() };
     });
     mocks.consumeSession.mockResolvedValue({
       url: "wss://runway.example",
       token: "livekit-token",
       roomName: "room-123",
     });
+    mocks.query.mockResolvedValue({
+      total: 122_926,
+      changePct: 3.3,
+      dip: { date: "2026-07-09", amount: -2_850 },
+    });
+    mocks.mutation.mockResolvedValue(4_806);
 
     await expect(createAvatarSession("nova-avatar")).resolves.toEqual({
       sessionId: "session-123",
@@ -65,9 +102,30 @@ describe("createAvatarSession", () => {
       sessionId: "session-123",
       apiKey: "mock-key",
     });
+    expect(mocks.createRpcHandler).toHaveBeenCalledWith(
+      expect.objectContaining({
+        apiKey: "mock-key",
+        sessionId: "session-123",
+      }),
+    );
+    await expect(
+      rpcOptions!.tools.get_revenue({ range: "30d" }),
+    ).resolves.toMatchObject({ total: 122_926 });
+    await expect(
+      rpcOptions!.tools.create_ticket({
+        subject: "Investigate refund",
+        team: "Billing",
+      }),
+    ).resolves.toEqual({ ticketId: 4_806 });
+    expect(mocks.query).toHaveBeenCalledWith(expect.anything(), { range: "30d" });
+    expect(mocks.mutation).toHaveBeenCalledWith(expect.anything(), {
+      subject: "Investigate refund",
+      team: "Billing",
+    });
     expect(mocks.consumeSession).toHaveBeenCalledWith({
       sessionId: "session-123",
       sessionKey: "session-key",
     });
+    rpcOptions!.onDisconnected();
   });
 });

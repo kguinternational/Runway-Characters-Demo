@@ -8,7 +8,7 @@ The shortest complete demo takes about two minutes.
    session or spend call credits.
 2. Return to `/overview`, choose light mode, and close any open panel.
 3. Click **Share screen & call** and choose the current Northstar tab.
-4. Wait for the connection message to clear and the call card to say **Mic live**.
+4. Wait for Nova to appear and greet you.
 
 Nova’s opening is only:
 
@@ -56,9 +56,8 @@ Expected: the Page Action clicks the visible theme control.
 
 ## If Nova cannot hear you
 
-- Confirm the card says **Mic live**, not **Microphone off**.
-- Speak once and look for the **Runway transcript:** line.
-- Use **Retry mic** if the SDK reports a device error.
+- Confirm the microphone button in Runway’s control bar is enabled.
+- Check that the browser granted microphone permission.
 - End and start a fresh call if the one-use session disconnects.
 
 The current Runway SDK has no public interruption or VAD setting. Barge-in is

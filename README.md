@@ -14,9 +14,9 @@ The implementation stays close to Runway’s official examples:
 </AvatarCall>
 ```
 
-Session creation is a [Next.js Server Action](./app/avatar-actions.ts). The only
-API endpoint is [`/api/avatar/tools`](./app/api/avatar/tools/route.ts), because
-Runway backend tools require one long-lived RPC connection per call.
+The single [Next.js Server Action](./actions/avatar.ts) creates and consumes
+the session and attaches Runway’s `createRpcHandler`. There is no separate RPC
+bridge or API route.
 
 ## Run locally
 
@@ -75,19 +75,16 @@ opening is:
 
 > Hi — how can I help?
 
-`@runwayml/avatars-react` does not expose an interruption/VAD setting. Runway
-handles barge-in automatically when the microphone track is live. The call card
-therefore reports `Mic live` from `isMicEnabled` (the published track), exposes
-the SDK retry control on microphone errors, and labels the incoming Runway
-session transcript so it is obvious whether speech reached the session.
+Runway handles barge-in automatically when the microphone is live. The demo uses
+the SDK’s standard `ControlBar` for microphone and screen-share controls.
 
 ## Project structure
 
 ```text
 app/
   (dashboard)/             # one page per route
-  api/avatar/tools/        # backend RPC bridge
-  avatar-actions.ts        # official Server Action session pattern
+actions/
+  avatar.ts                # session creation and backend RPC
 components/
   agent/
   layout/

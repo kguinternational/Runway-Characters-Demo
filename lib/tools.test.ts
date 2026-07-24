@@ -17,9 +17,6 @@ describe("Nova tool contract", () => {
       );
     }
 
-    expect(
-      sessionTools.find((tool) => tool.name === "click")?.description,
-    ).toContain("highlight");
   });
 
   it("keeps Zod validation and explicit client-tool parameters in sync", () => {
@@ -41,7 +38,6 @@ describe("Nova tool contract", () => {
     expect(rangeTool?.parameters?.[0]).toMatchObject({
       name: "range",
       enum: ["7d", "30d", "90d"],
-      required: true,
     });
   });
 

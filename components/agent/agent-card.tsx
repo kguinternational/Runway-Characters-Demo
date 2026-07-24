@@ -6,73 +6,29 @@ import {
   ControlBar,
   ScreenShareVideo,
 } from "@runwayml/avatars-react";
-import { Headphones, LoaderCircle, MonitorUp, Sparkles } from "lucide-react";
+import { Headphones, MonitorUp } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 
-import { createAvatarSession } from "@/app/avatar-actions";
-import { AgentStatus } from "@/components/agent/agent-status";
+import { createAvatarSession } from "@/actions/avatar";
 import { ClientToolHandlers } from "@/components/agent/client-tool-handlers";
-import { RpcBridge } from "@/components/agent/rpc-bridge";
 import { Button } from "@/components/ui/button";
 import { NOVA_AVATAR_ID, NOVA_IMAGE } from "@/lib/avatar";
 
 export function AgentCard() {
   const [started, setStarted] = useState(false);
-  const [starting, setStarting] = useState(false);
-  const [connecting, setConnecting] = useState(false);
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const endCall = useCallback(() => {
+  async function startWithScreenShare() {
+    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    setScreenStream(stream);
+    setStarted(true);
+  }
+
+  function endCall() {
     screenStream?.getTracks().forEach((track) => track.stop());
     setScreenStream(null);
     setStarted(false);
-    setStarting(false);
-    setConnecting(false);
-  }, [screenStream]);
-
-  useEffect(() => endCall, [endCall]);
-
-  const connectAvatar = useCallback(
-    async (avatarId: string) => {
-      setConnecting(true);
-      try {
-        return await createAvatarSession(avatarId);
-      } catch (connectError) {
-        setError(
-          connectError instanceof Error
-            ? connectError.message
-            : "Could not connect to Nova.",
-        );
-        endCall();
-        throw connectError;
-      } finally {
-        setConnecting(false);
-      }
-    },
-    [endCall],
-  );
-
-  async function startCall(shareScreen: boolean) {
-    setError(null);
-    setStarting(true);
-
-    try {
-      const stream = shareScreen
-        ? await navigator.mediaDevices.getDisplayMedia({ video: true })
-        : null;
-      setScreenStream(stream);
-      setConnecting(true);
-      setStarted(true);
-    } catch (startError) {
-      setConnecting(false);
-      setError(
-        startError instanceof Error ? startError.message : "Could not start the call.",
-      );
-    } finally {
-      setStarting(false);
-    }
   }
 
   return (
@@ -91,42 +47,20 @@ export function AgentCard() {
       </div>
 
       {started ? (
-        <div className="relative h-[405px]">
-          {connecting ? (
-            <div
-              className="absolute inset-0 z-20 grid place-items-center bg-[#101514]/92 text-sm text-white/70"
-              aria-live="polite"
-            >
-              <span className="flex items-center gap-2">
-                <LoaderCircle className="size-4 animate-spin" />
-                {screenStream
-                  ? "Screen selected · connecting to Nova…"
-                  : "Connecting to Nova…"}
-              </span>
-            </div>
-          ) : null}
-          <AvatarCall
-            avatarId={NOVA_AVATAR_ID}
-            connect={connectAvatar}
-            avatarImageUrl={NOVA_IMAGE}
-            initialScreenStream={screenStream ?? undefined}
-            audio
-            video={false}
-            className="nova-call"
-            onEnd={endCall}
-            onError={(callError) => {
-              setError(callError.message);
-              endCall();
-            }}
-          >
-            <AvatarVideo />
-            <ScreenShareVideo />
-            <AgentStatus />
-            <ClientToolHandlers />
-            <RpcBridge />
-            <ControlBar showCamera={false} showScreenShare />
-          </AvatarCall>
-        </div>
+        <AvatarCall
+          avatarId={NOVA_AVATAR_ID}
+          connect={createAvatarSession}
+          initialScreenStream={screenStream ?? undefined}
+          video={false}
+          className="h-[405px] rounded-none"
+          onEnd={endCall}
+          onError={console.error}
+        >
+          <AvatarVideo />
+          <ScreenShareVideo />
+          <ClientToolHandlers />
+          <ControlBar showCamera={false} showScreenShare />
+        </AvatarCall>
       ) : (
         <div className="p-5">
           <div className="flex items-center gap-4">
@@ -147,41 +81,26 @@ export function AgentCard() {
               </h2>
             </div>
           </div>
-          <p className="mt-4 text-sm leading-6 text-white/58">
-            Start a call, then ask Nova to navigate, inspect revenue, or create a ticket.
-          </p>
-          {error ? (
-            <p className="mt-3 rounded-xl bg-red-400/10 px-3 py-2 text-xs leading-5 text-red-200">
-              {error}
-            </p>
-          ) : null}
           <div className="mt-5 grid gap-2">
             <Button
               variant="accent"
               className="w-full"
-              disabled={starting}
-              onClick={() => void startCall(true)}
+              onClick={startWithScreenShare}
             >
-              {starting ? <LoaderCircle className="size-4 animate-spin" /> : <MonitorUp className="size-4" />}
+              <MonitorUp className="size-4" />
               Share screen & call
             </Button>
             <Button
               variant="ghost"
               className="w-full border border-white/10 text-white/65 hover:bg-white/10 hover:text-white"
-              disabled={starting}
-              onClick={() => void startCall(false)}
+              onClick={() => setStarted(true)}
             >
-              {starting ? <LoaderCircle className="size-4 animate-spin" /> : <Headphones className="size-4" />}
+              <Headphones className="size-4" />
               Voice only
             </Button>
           </div>
         </div>
       )}
-
-      <div className="flex h-10 items-center gap-2 border-t border-white/10 px-4 font-mono text-[0.62rem] text-white/48">
-        <Sparkles className="size-3.5 text-[var(--accent)]" />
-        Short greeting · live microphone status
-      </div>
     </aside>
   );
 }

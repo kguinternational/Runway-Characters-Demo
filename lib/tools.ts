@@ -5,21 +5,20 @@ import { z } from "zod";
 type SessionTools = NonNullable<RealtimeSessionCreateParams["tools"]>;
 
 export const setDateRangeTool = clientTool("set_date_range", {
-  description:
-    "Show a revenue date range. Navigate to Revenue first, change the visible chart, then briefly confirm the change.",
+  description: "Change the visible range on the Revenue page.",
   schema: z.object({ range: z.enum(["7d", "30d", "90d"]) }),
 });
 
 export const openPanelTool = clientTool("open_panel", {
-  description:
-    "Open the same information panel the user can open by clicking the dashboard, then briefly confirm it.",
+  description: "Open an information panel on the dashboard.",
   schema: z.object({
     title: z.string(),
     body: z.string(),
   }),
 });
 
-const clientTools = [
+// Zod validates browser events. Parameters tell the model what arguments to send.
+const clientTools: SessionTools = [
   {
     ...setDateRangeTool,
     parameters: [
@@ -27,7 +26,6 @@ const clientTools = [
         name: "range",
         type: "string",
         enum: ["7d", "30d", "90d"],
-        required: true,
         description: "The visible range: 7d, 30d, or 90d.",
       },
     ],
@@ -35,13 +33,13 @@ const clientTools = [
   {
     ...openPanelTool,
     parameters: [
-      { name: "title", type: "string", required: true, description: "Short panel title." },
-      { name: "body", type: "string", required: true, description: "Short panel message." },
+      { name: "title", type: "string", description: "Short panel title." },
+      { name: "body", type: "string", description: "Short panel message." },
     ],
   },
-] satisfies SessionTools;
+];
 
-const serverTools = [
+const serverTools: SessionTools = [
   {
     type: "backend_rpc",
     name: "get_revenue",
@@ -53,7 +51,6 @@ const serverTools = [
         name: "range",
         type: "string",
         enum: ["7d", "30d", "90d"],
-        required: true,
         description: "The database range: 7d, 30d, or 90d.",
       },
     ],
@@ -65,29 +62,19 @@ const serverTools = [
       "Create a real support ticket in Convex when the user asks. Return and speak the ticket ID, then open a confirmation panel.",
     timeoutSeconds: 8,
     parameters: [
-      { name: "subject", type: "string", required: true, description: "Ticket subject." },
+      { name: "subject", type: "string", description: "Ticket subject." },
       {
         name: "team",
         type: "string",
         enum: ["Billing", "Support", "Product"],
-        required: true,
         description: "Owning team.",
       },
     ],
   },
-] satisfies SessionTools;
+];
 
-const pageActions = pageActionTools.map((tool) => ({
-  ...tool,
-  description:
-    tool.name === "click"
-      ? "Click an interactive element by target ID. Always highlight that same target first, then click it, then briefly confirm the action."
-      : `${tool.description}, then briefly tell the user what you did.`,
-})) as SessionTools;
-
-// The SDK owns the Page Action parameters; this cast only bridges a declaration mismatch.
-export const sessionTools: SessionTools = [
-  ...pageActions,
+export const sessionTools = [
+  ...pageActionTools,
   ...clientTools,
   ...serverTools,
-];
+] as SessionTools;

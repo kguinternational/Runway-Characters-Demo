@@ -15,8 +15,8 @@ importers:
         specifier: ^0.17.0
         version: 0.17.0(@types/dom-mediacapture-record@1.0.22)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tslib@2.8.1)
       '@runwayml/sdk':
-        specifier: ^4.10.0
-        version: 4.11.0
+        specifier: ^4.12.0
+        version: 4.12.0
       '@tailwindcss/postcss':
         specifier: ^4.3.2
         version: 4.3.3
@@ -936,8 +936,8 @@ packages:
   '@runwayml/avatars@0.17.0':
     resolution: {integrity: sha512-jbi1pITBtzSak6hlS7cGTjK/dgLKGnmx4qmcWOpljPh5whnWBgTKTb+03Kjx5CHE/L4EklAN5S1G35E6ZqJUzw==}
 
-  '@runwayml/sdk@4.11.0':
-    resolution: {integrity: sha512-n0THLY/0qLR8aAy5Jo3qh+C0rHK8qHAO8kr3A9xRgJN+WJNz6ieHE7304UWVpB8efcDTig/pbThcKtMLG2Z/pA==}
+  '@runwayml/sdk@4.12.0':
+    resolution: {integrity: sha512-C7P7NSofG6ZGP5oSyr+k57naXHLPW4e/sYj7bdMKX311DfPB1BeVzYX02j2b37mBSmwnuN4nZpbz/jefsAYcRg==}
     hasBin: true
 
   '@standard-schema/spec@1.1.0':
@@ -3955,7 +3955,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/dom-mediacapture-record'
 
-  '@runwayml/sdk@4.11.0': {}
+  '@runwayml/sdk@4.12.0': {}
 
   '@standard-schema/spec@1.1.0': {}
 

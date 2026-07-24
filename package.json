@@ -19,7 +19,7 @@
   "dependencies": {
     "@runwayml/avatars-node-rpc": "^0.1.0",
     "@runwayml/avatars-react": "^0.17.0",
-    "@runwayml/sdk": "^4.10.0",
+    "@runwayml/sdk": "^4.12.0",
     "@tailwindcss/postcss": "^4.3.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
