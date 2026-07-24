@@ -20,7 +20,7 @@ Runway backend tools require one long-lived RPC connection per call.
 
 ## Run locally
 
-Requirements: Node 20+, pnpm, a Runway API key with Characters credits, and a
+Requirements: Node 22.13+, pnpm, a Runway API key with Characters credits, and a
 Convex account.
 
 ```bash

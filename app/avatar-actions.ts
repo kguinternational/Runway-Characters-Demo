@@ -5,9 +5,8 @@ import { pollUntilReady } from "@runwayml/avatars-react/api";
 
 import { sessionTools } from "@/lib/tools";
 
-const runway = new Runway();
-
 export async function createAvatarSession(avatarId: string) {
+  const runway = new Runway();
   const { id: sessionId } = await runway.realtimeSessions.create({
     model: "gwm1_avatars",
     avatar: { type: "custom", avatarId },

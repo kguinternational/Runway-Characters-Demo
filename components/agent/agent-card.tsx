@@ -96,7 +96,7 @@ export function AgentCard() {
               width={72}
               height={72}
               className="size-[72px] rounded-2xl object-cover object-top"
-              priority
+              preload
             />
             <div>
               <p className="font-mono text-[0.61rem] uppercase tracking-[0.16em] text-white/42">
