@@ -6,7 +6,7 @@ The shortest complete demo takes about two minutes.
 
 1. Open `/settings` and click **Test microphone**. This does not start a Runway
    session or spend call credits.
-2. Return to `/overview`, choose light mode, and close any open panel.
+2. Return to `/`, choose light mode, and close any open panel.
 3. Click **Share screen & call** and choose the current Northstar tab.
 4. Wait for Nova to appear and greet you.
 
@@ -22,7 +22,7 @@ Nova’s opening is only:
 
 Expected:
 
-- navigation visibly changes from `/overview` to `/revenue`;
+- navigation visibly changes from `/` to `/revenue`;
 - Nova highlights the Revenue navigation target before clicking it;
 - Page Actions scroll to and highlight the chart;
 - `set_date_range` selects 30 days;

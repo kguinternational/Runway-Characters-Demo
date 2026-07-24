@@ -40,12 +40,11 @@ Then start Convex, seed the demo data, and run Next.js:
 pnpm demo
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The root redirects to
-`/overview`.
+Open [http://localhost:3000](http://localhost:3000).
 
 ## Routes
 
-- `/overview` — clickable KPIs, alerts, activity, and quick links.
+- `/` — Overview with clickable KPIs, alerts, activity, and quick links.
 - `/revenue` — real range controls, revenue chart, refund detail, and CSV export.
 - `/tickets` — filters, ticket details, and a real Convex-backed create form.
 - `/settings` — theme, alerts, character detail, microphone test, and call guidance.

@@ -16,7 +16,7 @@ import { useDashboard } from "@/components/layout/dashboard-provider";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { href: "/overview", label: "Overview", icon: BarChart3, target: "overview" },
+  { href: "/", label: "Overview", icon: BarChart3, target: "overview" },
   { href: "/revenue", label: "Revenue", icon: ChartNoAxesCombined, target: "revenue" },
   { href: "/tickets", label: "Tickets", icon: TicketCheck, target: "tickets" },
   { href: "/settings", label: "Settings", icon: Settings2, target: "settings" },
@@ -28,7 +28,7 @@ export function Sidebar() {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-[218px] flex-col border-r border-white/8 bg-[#111514] text-[#f4f1e8] md:flex">
-      <Link href="/overview" className="flex h-[78px] items-center gap-3 border-b border-white/8 px-5">
+      <Link href="/" className="flex h-[78px] items-center gap-3 border-b border-white/8 px-5">
         <span className="grid size-9 place-items-center rounded-xl bg-[var(--accent)] text-[#101510]">
           <Command className="size-[18px]" />
         </span>

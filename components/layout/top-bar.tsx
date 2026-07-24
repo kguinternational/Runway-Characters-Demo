@@ -9,7 +9,7 @@ import { useDashboard } from "@/components/layout/dashboard-provider";
 import { Button } from "@/components/ui/button";
 
 const pageNames: Record<string, string> = {
-  "/overview": "Overview",
+  "/": "Overview",
   "/revenue": "Revenue",
   "/tickets": "Tickets",
   "/settings": "Settings",
@@ -24,7 +24,7 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--line)] bg-[color:var(--paper)]/88 backdrop-blur-xl">
       <div className="flex h-[66px] items-center justify-between px-4 sm:px-7 lg:px-8">
-        <Link href="/overview" className="flex items-center gap-3 md:hidden">
+        <Link href="/" className="flex items-center gap-3 md:hidden">
           <span className="grid size-8 place-items-center rounded-xl bg-[var(--ink)] text-[var(--accent)]">
             <Command className="size-4" />
           </span>
