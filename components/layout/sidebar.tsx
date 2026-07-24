@@ -16,10 +16,10 @@ import { useDashboard } from "@/components/layout/dashboard-provider";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { href: "/overview", label: "Overview", icon: BarChart3, target: "nav-overview" },
-  { href: "/revenue", label: "Revenue", icon: ChartNoAxesCombined, target: "nav-revenue" },
-  { href: "/tickets", label: "Tickets", icon: TicketCheck, target: "nav-tickets" },
-  { href: "/settings", label: "Settings", icon: Settings2, target: "nav-settings" },
+  { href: "/overview", label: "Overview", icon: BarChart3, target: "overview" },
+  { href: "/revenue", label: "Revenue", icon: ChartNoAxesCombined, target: "revenue" },
+  { href: "/tickets", label: "Tickets", icon: TicketCheck, target: "tickets" },
+  { href: "/settings", label: "Settings", icon: Settings2, target: "settings" },
 ];
 
 export function Sidebar() {

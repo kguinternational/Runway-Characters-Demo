@@ -20,6 +20,7 @@ import { NOVA_AVATAR_ID, NOVA_IMAGE } from "@/lib/avatar";
 export function AgentCard() {
   const [started, setStarted] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [connecting, setConnecting] = useState(false);
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,9 +29,30 @@ export function AgentCard() {
     setScreenStream(null);
     setStarted(false);
     setStarting(false);
+    setConnecting(false);
   }, [screenStream]);
 
   useEffect(() => endCall, [endCall]);
+
+  const connectAvatar = useCallback(
+    async (avatarId: string) => {
+      setConnecting(true);
+      try {
+        return await createAvatarSession(avatarId);
+      } catch (connectError) {
+        setError(
+          connectError instanceof Error
+            ? connectError.message
+            : "Could not connect to Nova.",
+        );
+        endCall();
+        throw connectError;
+      } finally {
+        setConnecting(false);
+      }
+    },
+    [endCall],
+  );
 
   async function startCall(shareScreen: boolean) {
     setError(null);
@@ -41,8 +63,10 @@ export function AgentCard() {
         ? await navigator.mediaDevices.getDisplayMedia({ video: true })
         : null;
       setScreenStream(stream);
+      setConnecting(true);
       setStarted(true);
     } catch (startError) {
+      setConnecting(false);
       setError(
         startError instanceof Error ? startError.message : "Could not start the call.",
       );
@@ -68,16 +92,32 @@ export function AgentCard() {
 
       {started ? (
         <div className="relative h-[405px]">
+          {connecting ? (
+            <div
+              className="absolute inset-0 z-20 grid place-items-center bg-[#101514]/92 text-sm text-white/70"
+              aria-live="polite"
+            >
+              <span className="flex items-center gap-2">
+                <LoaderCircle className="size-4 animate-spin" />
+                {screenStream
+                  ? "Screen selected · connecting to Nova…"
+                  : "Connecting to Nova…"}
+              </span>
+            </div>
+          ) : null}
           <AvatarCall
             avatarId={NOVA_AVATAR_ID}
-            connect={createAvatarSession}
+            connect={connectAvatar}
             avatarImageUrl={NOVA_IMAGE}
             initialScreenStream={screenStream ?? undefined}
             audio
             video={false}
             className="nova-call"
             onEnd={endCall}
-            onError={(callError) => setError(callError.message)}
+            onError={(callError) => {
+              setError(callError.message);
+              endCall();
+            }}
           >
             <AvatarVideo />
             <ScreenShareVideo />

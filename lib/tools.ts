@@ -6,12 +6,13 @@ type SessionTools = NonNullable<RealtimeSessionCreateParams["tools"]>;
 
 export const setDateRangeTool = clientTool("set_date_range", {
   description:
-    "Show a revenue date range. Navigate to Revenue first, then change the visible chart.",
+    "Show a revenue date range. Navigate to Revenue first, change the visible chart, then briefly confirm the change.",
   schema: z.object({ range: z.enum(["7d", "30d", "90d"]) }),
 });
 
 export const openPanelTool = clientTool("open_panel", {
-  description: "Open the same information panel the user can open by clicking the dashboard.",
+  description:
+    "Open the same information panel the user can open by clicking the dashboard, then briefly confirm it.",
   schema: z.object({
     title: z.string(),
     body: z.string(),
@@ -76,9 +77,17 @@ const serverTools = [
   },
 ] satisfies SessionTools;
 
-// The SDK owns the Page Action definitions; this cast only bridges a declaration mismatch.
+const pageActions = pageActionTools.map((tool) => ({
+  ...tool,
+  description:
+    tool.name === "click"
+      ? "Click an interactive element by target ID. Always highlight that same target first, then click it, then briefly confirm the action."
+      : `${tool.description}, then briefly tell the user what you did.`,
+})) as SessionTools;
+
+// The SDK owns the Page Action parameters; this cast only bridges a declaration mismatch.
 export const sessionTools: SessionTools = [
-  ...(pageActionTools as unknown as SessionTools),
+  ...pageActions,
   ...clientTools,
   ...serverTools,
 ];

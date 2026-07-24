@@ -16,6 +16,10 @@ describe("Nova tool contract", () => {
         true,
       );
     }
+
+    expect(
+      sessionTools.find((tool) => tool.name === "click")?.description,
+    ).toContain("highlight");
   });
 
   it("keeps Zod validation and explicit client-tool parameters in sync", () => {

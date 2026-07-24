@@ -24,6 +24,7 @@ vi.mock("@runwayml/avatars-react/api", async (importOriginal) => {
 });
 
 import { createAvatarSession } from "@/app/avatar-actions";
+import { NOVA_PERSONALITY, NOVA_START_SCRIPT } from "@/lib/avatar";
 
 describe("createAvatarSession", () => {
   beforeEach(() => {
@@ -56,6 +57,8 @@ describe("createAvatarSession", () => {
         model: "gwm1_avatars",
         avatar: { type: "custom", avatarId: "nova-avatar" },
         maxDuration: 300,
+        personality: NOVA_PERSONALITY,
+        startScript: NOVA_START_SCRIPT,
       }),
     );
     expect(mocks.pollUntilReady).toHaveBeenCalledWith({

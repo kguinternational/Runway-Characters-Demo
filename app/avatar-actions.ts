@@ -6,6 +6,7 @@ import {
   pollUntilReady,
 } from "@runwayml/avatars-react/api";
 
+import { NOVA_PERSONALITY, NOVA_START_SCRIPT } from "@/lib/avatar";
 import { sessionTools } from "@/lib/tools";
 
 export async function createAvatarSession(avatarId: string) {
@@ -14,6 +15,8 @@ export async function createAvatarSession(avatarId: string) {
     model: "gwm1_avatars",
     avatar: { type: "custom", avatarId },
     maxDuration: 300,
+    personality: NOVA_PERSONALITY,
+    startScript: NOVA_START_SCRIPT,
     tools: sessionTools,
   });
 

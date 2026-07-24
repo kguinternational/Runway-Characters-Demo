@@ -19,7 +19,7 @@ export function AgentStatus() {
           />
           {avatar.status === "ready"
             ? isMicEnabled
-              ? "Listening"
+              ? "Mic live"
               : "Microphone off"
             : "Connecting"}
         </span>
@@ -34,7 +34,7 @@ export function AgentStatus() {
       </div>
       {latest ? (
         <p className="mt-1 truncate text-white/55" aria-live="polite">
-          Heard: {latest}
+          Runway transcript: {latest}
         </p>
       ) : null}
     </div>

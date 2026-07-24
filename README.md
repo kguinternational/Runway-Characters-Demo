@@ -2,7 +2,7 @@
 
 Northstar is a small analytics dashboard with Nova, a realtime Runway Character.
 Nova can navigate the app, operate visible controls, read live Convex revenue, and
-create real support tickets.
+create real support tickets. This demo is configured to run locally only.
 
 The implementation stays close to Runway’s official examples:
 
@@ -64,6 +64,9 @@ All agent actions have a normal clickable equivalent:
 - `create_ticket` uses the same Convex mutation as the New ticket form.
 
 Tool definitions live in [`lib/tools.ts`](./lib/tools.ts).
+Session instructions live in [`lib/avatar.ts`](./lib/avatar.ts): Nova highlights
+before every Page Action click, speaks after every tool sequence, and can explain
+the visible Overview, Revenue, Tickets, and Settings pages.
 
 ## Voice behavior
 
@@ -74,9 +77,9 @@ opening is:
 
 `@runwayml/avatars-react` does not expose an interruption/VAD setting. Runway
 handles barge-in automatically when the microphone track is live. The call card
-therefore reports `Listening` from `isMicEnabled` (the published track), exposes
-the SDK retry control on microphone errors, and displays incoming transcription
-so it is obvious whether speech is reaching the session.
+therefore reports `Mic live` from `isMicEnabled` (the published track), exposes
+the SDK retry control on microphone errors, and labels the incoming Runway
+session transcript so it is obvious whether speech reached the session.
 
 ## Project structure
 
@@ -112,18 +115,3 @@ pnpm build
 
 Use the Settings page’s microphone test before recording; it checks browser
 permission without creating a Runway call.
-
-## Deploy
-
-In Vercel, add `RUNWAYML_API_SECRET`, `CONVEX_URL`, and
-`NEXT_PUBLIC_CONVEX_URL`. Deploy the linked project with:
-
-```bash
-pnpm exec vercel deploy --prod --yes
-```
-
-If you change the functions in `convex/`, deploy those separately with
-`pnpm exec convex deploy`.
-
-The backend-tool endpoint has a five-minute max duration to match a Characters
-session.

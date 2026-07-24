@@ -22,7 +22,8 @@ import { POST } from "@/app/api/avatar/tools/route";
 
 type RpcOptions = {
   sessionId: string;
-  onConnected: () => void;
+  onDisconnected: () => void;
+  onError: (error: Error) => void;
   tools: {
     get_revenue: (args: Record<string, unknown>) => Promise<unknown>;
     create_ticket: (args: Record<string, unknown>) => Promise<unknown>;
@@ -34,7 +35,6 @@ describe("POST /api/avatar/tools", () => {
     let options: RpcOptions | undefined;
     mocks.createRpcHandler.mockImplementation(async (value: RpcOptions) => {
       options = value;
-      value.onConnected();
       return { close: mocks.close };
     });
     mocks.query.mockResolvedValue({
@@ -44,16 +44,14 @@ describe("POST /api/avatar/tools", () => {
     });
     mocks.mutation.mockResolvedValue(4_806);
 
-    const response = await POST(
+    const responsePromise = POST(
       new Request("http://localhost/api/avatar/tools", {
         method: "POST",
         body: JSON.stringify({ sessionId: "session-123" }),
       }),
     );
-    const reader = response.body!.getReader();
-    const firstChunk = await reader.read();
 
-    expect(new TextDecoder().decode(firstChunk.value)).toContain("connected");
+    await vi.waitFor(() => expect(options).toBeDefined());
     expect(options?.sessionId).toBe("session-123");
     await expect(options!.tools.get_revenue({ range: "30d" })).resolves.toMatchObject({
       total: 122_926,
@@ -67,7 +65,8 @@ describe("POST /api/avatar/tools", () => {
       team: "Billing",
     });
 
-    await reader.cancel();
-    expect(mocks.close).toHaveBeenCalled();
+    options!.onDisconnected();
+    await expect(responsePromise).resolves.toMatchObject({ status: 204 });
+    expect(mocks.close).toHaveBeenCalledOnce();
   });
 });
