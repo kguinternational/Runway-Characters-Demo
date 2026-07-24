@@ -3,13 +3,12 @@ export type RevenueRange = "7d" | "30d" | "90d";
 export interface RevenuePoint {
   date: string;
   amount: number;
-  refunded?: boolean;
+  refunded: boolean;
 }
 
 export interface RevenueDip {
   date: string;
   amount: number;
-  reason?: string;
 }
 
 export interface RevenueResult {
@@ -20,7 +19,6 @@ export interface RevenueResult {
 }
 
 export interface TicketRecord {
-  _id?: string;
   ticketId: number;
   subject: string;
   team: string;

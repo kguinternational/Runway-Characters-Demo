@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { InfoPanel } from "@/components/overlays/info-panel";
 
 describe("InfoPanel", () => {
-  it("shows the exact confirmation supplied by Nova's client tool", () => {
+  it("shows the selected dashboard detail", () => {
     render(
       <InfoPanel
         panel={{

@@ -7,9 +7,13 @@ create real support tickets. This demo is configured to run locally only.
 The implementation stays close to Runway’s official examples:
 
 ```tsx
-<AvatarCall avatarId={NOVA_AVATAR_ID} credentials={credentials}>
+<AvatarCall
+  avatarId={NOVA_AVATAR_ID}
+  connect={createAvatarSession}
+  video={false}
+>
   <AvatarVideo />
-  <ControlBar showScreenShare />
+  <ControlBar showCamera={false} showScreenShare />
   <PageActions />
 </AvatarCall>
 ```
@@ -58,15 +62,14 @@ All agent actions have a normal clickable equivalent:
 
 - Page Actions click the same links and buttons a user can click.
 - `set_date_range` changes the same 7/30/90-day controls.
-- `open_panel` opens the same detail panel used by cards and rows.
 - `get_revenue` reads the values already visible on the Revenue page.
 - `create_ticket` uses the same Convex mutation as the New ticket form.
+- Detail panels open when Nova clicks the same cards and rows as the user.
 
 Tool definitions live in [`lib/tools.ts`](./lib/tools.ts).
-Session instructions live in [`lib/avatar.ts`](./lib/avatar.ts): Nova highlights
-before every Page Action click, speaks before client actions and after server
-results, and can explain the visible Overview, Revenue, Tickets, and Settings
-pages.
+Session instructions live in [`lib/avatar.ts`](./lib/avatar.ts): Nova follows
+speech → tools → speech, highlights before every click, and pauses to speak
+after navigation before acting on the destination page.
 
 ## Voice behavior
 
@@ -76,9 +79,10 @@ opening is:
 > Hi — how can I help?
 
 Runway handles barge-in automatically when the microphone is live. The demo uses
-the SDK’s standard `ControlBar` for microphone and screen-share controls. The
-Share screen & call button uses the documented `getDisplayMedia({ video: true })`
-and `initialScreenStream` flow.
+the SDK’s standard `ControlBar` for microphone and screen sharing. Start the
+call, then use its screen button. The shared screen is sent to Nova without a
+local `ScreenShareVideo` preview, matching Runway’s current example and avoiding
+a recursive preview when this tab is shared.
 
 ## Project structure
 

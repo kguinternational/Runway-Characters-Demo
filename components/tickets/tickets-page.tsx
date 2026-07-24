@@ -2,35 +2,28 @@
 
 import { Plus, SlidersHorizontal } from "lucide-react";
 import { useQuery } from "convex/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useDashboard } from "@/components/layout/dashboard-provider";
 import { PageHeader } from "@/components/layout/page-header";
 import { NewTicketDialog } from "@/components/tickets/new-ticket-dialog";
 import { TicketsTable } from "@/components/tickets/tickets-table";
 import { Button } from "@/components/ui/button";
-import { listRecentTicketsRef } from "@/lib/convex-functions";
-import type { TicketRecord } from "@/lib/types";
+import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | "open" | "billing";
 
 export function TicketsPage() {
   const { openPanel } = useDashboard();
-  const tickets = useQuery(listRecentTicketsRef, { limit: 30 }) as
-    | TicketRecord[]
-    | undefined;
+  const tickets = useQuery(api.tickets.listRecent, { limit: 30 });
   const [filter, setFilter] = useState<Filter>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const filteredTickets = useMemo(
-    () =>
-      tickets?.filter((ticket) => {
-        if (filter === "open") return ticket.status === "open";
-        if (filter === "billing") return ticket.team === "Billing";
-        return true;
-      }),
-    [filter, tickets],
-  );
+  const filteredTickets = tickets?.filter((ticket) => {
+    if (filter === "open") return ticket.status === "open";
+    if (filter === "billing") return ticket.team === "Billing";
+    return true;
+  });
 
   return (
     <div id="tickets-page" data-avatar-target="tickets-page">

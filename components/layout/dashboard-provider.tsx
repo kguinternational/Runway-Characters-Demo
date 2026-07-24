@@ -1,9 +1,7 @@
 "use client";
 
-import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-import { ConfigurationRequired } from "@/components/layout/configuration-required";
 import type { InfoPanelState, RevenueRange } from "@/lib/types";
 
 type DashboardContextValue = {
@@ -23,30 +21,19 @@ export function DashboardProvider({
 }) {
   const [range, setRange] = useState<RevenueRange>("90d");
   const [panel, setPanel] = useState<InfoPanelState | null>(null);
-  const convex = useMemo(
-    () =>
-      process.env.NEXT_PUBLIC_CONVEX_URL
-        ? new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL)
-        : null,
-    [],
-  );
-
-  if (!convex) return <ConfigurationRequired />;
 
   return (
-    <ConvexProvider client={convex}>
-      <DashboardContext.Provider
-        value={{
-          range,
-          setRange,
-          panel,
-          openPanel: setPanel,
-          closePanel: () => setPanel(null),
-        }}
-      >
-        {children}
-      </DashboardContext.Provider>
-    </ConvexProvider>
+    <DashboardContext.Provider
+      value={{
+        range,
+        setRange,
+        panel,
+        openPanel: setPanel,
+        closePanel: () => setPanel(null),
+      }}
+    >
+      {children}
+    </DashboardContext.Provider>
   );
 }
 

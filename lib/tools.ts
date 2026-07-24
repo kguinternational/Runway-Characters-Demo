@@ -3,16 +3,9 @@ import type { RealtimeSessionCreateParams } from "@runwayml/sdk/resources/realti
 import { z } from "zod";
 
 export const setDateRangeTool = clientTool("set_date_range", {
-  description: "Change the visible range on the Revenue page.",
+  description:
+    "After telling the user what you are changing, show 7, 30, or 90 days on the visible Revenue chart.",
   schema: z.object({ range: z.enum(["7d", "30d", "90d"]) }),
-});
-
-export const openPanelTool = clientTool("open_panel", {
-  description: "Open an information panel on the dashboard.",
-  schema: z.object({
-    title: z.string(),
-    body: z.string(),
-  }),
 });
 
 // Zod validates browser events. Parameters tell the model what arguments to send.
@@ -30,17 +23,10 @@ export const sessionTools = [
     ],
   },
   {
-    ...openPanelTool,
-    parameters: [
-      { name: "title", type: "string", description: "Short panel title." },
-      { name: "body", type: "string", description: "Short panel message." },
-    ],
-  },
-  {
     type: "backend_rpc",
     name: "get_revenue",
     description:
-      "Read the live revenue total, change, and refund dip from Convex. Use this for any revenue question instead of estimating from the chart.",
+      "Read the live revenue total, change, and refund dip from Convex when the user asks about revenue or chart insights. Speak the returned values instead of estimating.",
     timeoutSeconds: 8,
     parameters: [
       {
@@ -55,7 +41,7 @@ export const sessionTools = [
     type: "backend_rpc",
     name: "create_ticket",
     description:
-      "Create a real support ticket in Convex when the user asks. Return and speak the ticket ID, then open a confirmation panel.",
+      "Create a real support ticket in Convex only when the user asks. Speak the returned ticket ID, then show the new ticket on the Tickets page.",
     timeoutSeconds: 8,
     parameters: [
       { name: "subject", type: "string", description: "Ticket subject." },

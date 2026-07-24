@@ -97,15 +97,14 @@ describe("createAvatarSession", () => {
       expect.objectContaining({
         model: "gwm1_avatars",
         avatar: { type: "custom", avatarId: NOVA_AVATAR_ID },
-        maxDuration: 300,
         personality: expect.stringContaining(
-          "Speak one short acknowledgement aloud first",
+          "the order is always speech → tools → speech",
         ),
         startScript: NOVA_START_SCRIPT,
       }),
     );
     expect(NOVA_PERSONALITY).toContain(
-      "For navigation or clicks, call highlight, then call click with the same target.",
+      "Before every click, call highlight and then click with the same target.",
     );
     expect(NOVA_PERSONALITY).toContain(
       "scroll_to and highlight revenue-chart",
@@ -129,15 +128,6 @@ describe("createAvatarSession", () => {
         team: "Billing",
       }),
     ).resolves.toEqual({ ticketId: 4_806 });
-    await expect(
-      rpcOptions!.tools.get_revenue({ range: "31d" }),
-    ).rejects.toThrow();
-    await expect(
-      rpcOptions!.tools.create_ticket({
-        subject: "Investigate refund",
-        team: "Finance",
-      }),
-    ).rejects.toThrow();
     expect(mocks.query).toHaveBeenCalledWith(expect.anything(), { range: "30d" });
     expect(mocks.mutation).toHaveBeenCalledWith(expect.anything(), {
       subject: "Investigate refund",

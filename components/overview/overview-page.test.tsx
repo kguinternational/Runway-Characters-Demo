@@ -44,7 +44,7 @@ describe("Overview capability map", () => {
     for (const label of [
       "get_revenue · set_date_range",
       "create_ticket",
-      "open_panel",
+      "click · open detail",
       "click · scroll_to · highlight",
     ]) {
       expect(screen.getByText(label)).toBeInTheDocument();

@@ -8,13 +8,12 @@ import { PageHeader } from "@/components/layout/page-header";
 import { RevenueChart } from "@/components/revenue/revenue-chart";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getRevenueRef } from "@/lib/convex-functions";
-import type { RevenueResult } from "@/lib/types";
+import { api } from "@/convex/_generated/api";
 import { formatCurrency, formatShortDate } from "@/lib/utils";
 
 export function RevenuePage() {
   const { range, setRange, openPanel } = useDashboard();
-  const revenue = useQuery(getRevenueRef, { range }) as RevenueResult | undefined;
+  const revenue = useQuery(api.revenue.getRevenue, { range });
 
   function exportCsv() {
     if (!revenue) return;

@@ -2,7 +2,6 @@ import { validateClientToolArgs } from "@runwayml/avatars-react/api";
 import { describe, expect, it } from "vitest";
 
 import {
-  openPanelTool,
   sessionTools,
   setDateRangeTool,
 } from "@/lib/tools";
@@ -24,15 +23,6 @@ describe("Nova tool contract", () => {
       validateClientToolArgs(setDateRangeTool, { range: "30d" }),
     ).toEqual({ range: "30d" });
     expect(validateClientToolArgs(setDateRangeTool, { range: "31d" })).toBeNull();
-    expect(
-      validateClientToolArgs(openPanelTool, {
-        title: "Ticket #4805 created",
-        body: "Billing owns the refund investigation.",
-      }),
-    ).toEqual({
-      title: "Ticket #4805 created",
-      body: "Billing owns the refund investigation.",
-    });
 
     const rangeTool = sessionTools.find((tool) => tool.name === "set_date_range");
     expect(rangeTool?.parameters?.[0]).toMatchObject({

@@ -5,7 +5,7 @@ import { useMutation } from "convex/react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { createTicketRef } from "@/lib/convex-functions";
+import { api } from "@/convex/_generated/api";
 
 export function NewTicketDialog({
   open,
@@ -16,7 +16,7 @@ export function NewTicketDialog({
   onClose: () => void;
   onCreated: (ticketId: number, subject: string, team: string) => void;
 }) {
-  const createTicket = useMutation(createTicketRef);
+  const createTicket = useMutation(api.tickets.createTicket);
   const [subject, setSubject] = useState("Investigate refund in the 30-day revenue report");
   const [team, setTeam] = useState("Billing");
   const [saving, setSaving] = useState(false);

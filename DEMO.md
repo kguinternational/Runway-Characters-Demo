@@ -7,8 +7,9 @@ The shortest complete demo takes about two minutes.
 1. Open `/settings` and click **Test microphone**. This does not start a Runway
    session or spend call credits.
 2. Return to `/`, choose light mode, and close any open panel.
-3. Click **Share screen & call** and choose the current Northstar tab.
-4. Wait for Nova to appear and greet you.
+3. Click **Start call** and wait for Nova to appear.
+4. In Runway’s control bar, click the screen button and choose the current
+   Northstar tab. The control bar confirms that sharing is active.
 
 Nova’s opening is only:
 
@@ -43,8 +44,8 @@ Expected:
 - Nova highlights the Tickets navigation target before clicking it;
 - `create_ticket` writes to Convex and returns a real ticket ID;
 - Nova speaks that ID;
-- `open_panel` opens the confirmation;
-- the new row appears reactively.
+- the new row appears reactively;
+- Nova highlights and clicks that row to open its details.
 
 The manual equivalent is **New ticket** → complete the form → **Create real
 ticket**.

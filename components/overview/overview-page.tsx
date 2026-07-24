@@ -1,8 +1,7 @@
 "use client";
 
-import { CreditCard, TicketCheck, Users } from "lucide-react";
+import { BadgeAlert, CreditCard, TicketCheck } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
 import { useQuery } from "convex/react";
 
 import { useDashboard } from "@/components/layout/dashboard-provider";
@@ -10,31 +9,15 @@ import { MetricCard } from "@/components/layout/metric-card";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { StatusPill } from "@/components/ui/status-pill";
-import {
-  getOpenCountRef,
-  getRevenueRef,
-  listRecentTicketsRef,
-} from "@/lib/convex-functions";
-import type { RevenueResult, TicketRecord } from "@/lib/types";
-import { formatCompactNumber, formatCurrency } from "@/lib/utils";
+import { api } from "@/convex/_generated/api";
+import { formatCurrency } from "@/lib/utils";
 
 export function OverviewPage() {
   const { openPanel } = useDashboard();
-  const revenue = useQuery(getRevenueRef, { range: "30d" }) as RevenueResult | undefined;
-  const tickets = useQuery(listRecentTicketsRef, { limit: 4 }) as TicketRecord[] | undefined;
-  const openCount = useQuery(getOpenCountRef, {}) as number | undefined;
-  const activeAccounts = useMemo(
-    () =>
-      revenue
-        ? Math.round(
-            revenue.series.reduce(
-              (total, point) => total + Math.max(point.amount, 0),
-              0,
-            ) / 37.5,
-          )
-        : undefined,
-    [revenue],
-  );
+  const revenue = useQuery(api.revenue.getRevenue, { range: "30d" });
+  const tickets = useQuery(api.tickets.listRecent, { limit: 4 });
+  const openCount = useQuery(api.tickets.getOpenCount);
+  const refundCount = revenue?.series.filter((point) => point.refunded).length;
 
   return (
     <div id="overview-page" data-avatar-target="overview-page">
@@ -66,16 +49,16 @@ export function OverviewPage() {
           }
         />
         <MetricCard
-          id="metric-accounts"
-          eyebrow="Active accounts"
-          value={activeAccounts ? formatCompactNumber(activeAccounts) : undefined}
-          detail="Derived from settled volume"
-          icon={Users}
-          trend="up"
+          id="metric-refunds"
+          eyebrow="Refunds flagged"
+          value={refundCount === undefined ? undefined : String(refundCount)}
+          detail="Marked in live Convex rows"
+          icon={BadgeAlert}
+          trend={refundCount ? "down" : "neutral"}
           onClick={() =>
             openPanel({
-              title: "Active accounts",
-              body: `${activeAccounts ?? 0} accounts contributed settled volume in this demo period.`,
+              title: "Refund flags",
+              body: `${refundCount ?? 0} refund rows are marked in the current 30-day period.`,
             })
           }
         />
@@ -199,7 +182,7 @@ export function OverviewPage() {
                 Open a dashboard detail
               </span>
               <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-[var(--muted)]">
-                open_panel
+                click · open detail
               </span>
             </button>
             <a

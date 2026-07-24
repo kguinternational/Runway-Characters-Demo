@@ -128,7 +128,7 @@ export function SettingsPage() {
               alt="Nova support character"
               width={72}
               height={72}
-              className="size-[72px] rounded-2xl object-cover object-top"
+              className="size-[72px] shrink-0 rounded-2xl object-cover object-top"
             />
             <div>
               <p className="font-mono text-[0.63rem] uppercase tracking-[0.16em] text-[var(--muted)]">
@@ -183,7 +183,7 @@ export function SettingsPage() {
               onClick={() =>
                 openPanel({
                   title: "Screen sharing",
-                  body: "Use Share screen & call on Nova’s card and choose the current Northstar tab.",
+                  body: "Start Nova’s call, then use the screen button in Runway’s control bar.",
                 })
               }
             >

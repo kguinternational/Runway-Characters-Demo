@@ -81,7 +81,7 @@ export function Sidebar() {
           onClick={() =>
             openPanel({
               title: "Two-minute demo",
-              body: "Ask Nova to investigate revenue, create a Billing ticket, then switch to dark mode.",
+              body: "Ask Nova to show 30-day revenue, explain the refund dip, create a Billing ticket, then switch to dark mode.",
             })
           }
         >
