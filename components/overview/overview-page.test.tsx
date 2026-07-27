@@ -18,7 +18,7 @@ const revenue = getDemoRevenue("30d");
 const tickets = [...DEMO_TICKETS].reverse();
 const ticketInsights = getTicketInsights(tickets);
 
-describe("Overview capability map", () => {
+describe("Overview tool examples", () => {
   const openPanel = vi.fn();
 
   beforeEach(() => {
@@ -39,44 +39,63 @@ describe("Overview capability map", () => {
     });
   });
 
-  it("shows every Runway session tool with a manual path", () => {
+  it("clearly separates every Runway session tool with a manual path", () => {
     render(<OverviewPage />);
+
+    expect(
+      screen.getByRole("heading", { name: "Changes what you see." }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Gives Nova something to say." }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Browser only")).toBeInTheDocument();
+    expect(screen.getByText("Returns data")).toBeInTheDocument();
 
     for (const label of [
       "get_overview_insights",
-      "get_revenue · set_date_range",
-      "get_ticket_insights · get_ticket · filter_tickets · update_ticket_status · refresh_tickets",
+      "get_revenue",
+      "get_ticket_insights",
+      "get_ticket",
       "create_ticket",
+      "update_ticket_status",
+      "set_date_range",
+      "filter_tickets",
       "open_panel",
-      "click · scroll_to · highlight",
+      "refresh_tickets",
+      "click",
+      "scroll_to",
+      "highlight",
     ]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
 
     expect(
-      screen.getByRole("link", { name: /read revenue \+ change range/i }),
+      screen.getByRole("link", { name: /show the last 7 days/i }),
     ).toHaveAttribute("href", "/revenue#revenue-chart");
     expect(
-      screen.getByRole("link", { name: /create a demo support ticket/i }),
+      screen.getByRole("link", { name: /show only billing tickets/i }),
     ).toHaveAttribute("href", "/tickets#tickets-actions");
     expect(
-      screen.getByRole("link", { name: /inspect and update the queue/i }),
-    ).toHaveAttribute("href", "/tickets#tickets-table");
+      screen.getByRole("link", { name: /create a billing ticket/i }),
+    ).toHaveAttribute("href", "/tickets#new-ticket");
+    expect(
+      screen.getByRole("link", { name: /close ticket #4803/i }),
+    ).toHaveAttribute("href", "/tickets#ticket-status-4803");
   });
 
   it("keeps details and page insights clickable without a Runway call", () => {
     render(<OverviewPage />);
 
     fireEvent.click(
-      screen.getByRole("button", { name: /open an insight panel/i }),
+      screen.getByRole("button", { name: /open the refund detail/i }),
     );
     expect(openPanel).toHaveBeenLastCalledWith({
-      title: "Demo dashboard detail",
+      title: "Refund dip",
       body: `${formatCurrency(revenue.dip!.amount)} is marked as a refund in the 30-day revenue view.`,
     });
 
     fireEvent.click(
-      screen.getByRole("button", { name: /read the overview insight/i }),
+      screen.getByRole("button", { name: /give me the dashboard brief/i }),
     );
     expect(openPanel).toHaveBeenLastCalledWith({
       title: "Overview insight",
