@@ -1,3 +1,7 @@
+https://runwayml.com/sonnysangha
+
+**Promo:** 50% off one month of any paid plan with code **`SKILLS50`**.
+
 # Northstar — Runway Characters demo
 
 Northstar is a small, local-only Next.js 16 dashboard with Nova, a realtime
