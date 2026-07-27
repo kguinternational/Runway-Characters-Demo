@@ -1,4 +1,4 @@
-https://runwayml.com/sonnysangha
+Sign up to Runway here: https://runwayml.com/sonnysangha
 
 **Promo:** 50% off one month of any paid plan with code **`SKILLS50`**.
 
