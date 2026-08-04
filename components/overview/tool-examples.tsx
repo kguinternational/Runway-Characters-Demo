@@ -69,7 +69,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “Show the last 7 days.”
+                  “Show 30 days of collections.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 text-[var(--muted)] transition group-hover:text-[var(--ink)]" />
               </span>
@@ -86,7 +86,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “Show only Billing tickets.”
+                  “Show only Financial tasks.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 text-[var(--muted)] transition group-hover:text-[var(--ink)]" />
               </span>
@@ -101,14 +101,14 @@ export function ToolExamples({
               className="group rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 text-left transition hover:-translate-y-0.5 hover:border-[var(--line-strong)]"
               onClick={() =>
                 openPanel({
-                  title: "Refund dip",
+                  title: "Rent Roll Mismatch",
                   body: refundInsight,
                 })
               }
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “Open the refund detail.”
+                  “Open the rent roll audit details.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 text-[var(--muted)] transition group-hover:text-[var(--ink)]" />
               </span>
@@ -125,7 +125,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “Refresh the ticket queue.”
+                  “Refresh the due diligence queue.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 text-[var(--muted)] transition group-hover:text-[var(--ink)]" />
               </span>
@@ -153,7 +153,7 @@ export function ToolExamples({
             Gives Nova something to say.
           </h3>
           <p className="mt-2 text-sm leading-6 opacity-65">
-            Reads or updates local demo data and returns a result Nova can
+            Reads or updates local deal metrics and returns a result Nova can
             explain aloud.
           </p>
 
@@ -164,14 +164,14 @@ export function ToolExamples({
               className="group rounded-xl border border-[var(--paper)]/15 p-4 text-left transition hover:-translate-y-0.5 hover:bg-[var(--paper)]/10"
               onClick={() =>
                 openPanel({
-                  title: "Overview insight",
+                  title: "Acquisition Overview",
                   body: overviewInsight,
                 })
               }
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “Give me the dashboard brief.”
+                  “Give me the deal summary brief.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 opacity-45 transition group-hover:opacity-100" />
               </span>
@@ -188,7 +188,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “What caused the revenue dip?”
+                  “Explain the rent roll audit surplus.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 opacity-45 transition group-hover:opacity-100" />
               </span>
@@ -205,7 +205,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “How busy is support?”
+                  “What is the due diligence workload?”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 opacity-45 transition group-hover:opacity-100" />
               </span>
@@ -222,7 +222,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “What is ticket #4803?”
+                  “What is task #4803?”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 opacity-45 transition group-hover:opacity-100" />
               </span>
@@ -239,7 +239,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “Create a Billing ticket.”
+                  “Add a Financial task.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 opacity-45 transition group-hover:opacity-100" />
               </span>
@@ -256,7 +256,7 @@ export function ToolExamples({
             >
               <span className="flex items-start justify-between gap-3">
                 <span className="text-sm font-semibold">
-                  “Close ticket #4803.”
+                  “Resolve task #4803.”
                 </span>
                 <ArrowUpRight className="size-4 shrink-0 opacity-45 transition group-hover:opacity-100" />
               </span>
@@ -269,13 +269,13 @@ export function ToolExamples({
       </div>
 
       <section
-        aria-labelledby="page-actions-title"
+        id="page-actions-title"
         className="flex flex-col gap-4 border-t border-[var(--line)] p-5 sm:p-6 xl:flex-row xl:items-center"
       >
         <div className="xl:w-64 xl:shrink-0">
           <div className="flex items-center gap-2">
             <MousePointerClick className="size-4 text-[var(--positive)]" />
-            <h3 id="page-actions-title" className="text-sm font-semibold">
+            <h3 className="text-sm font-semibold">
               Built-in page actions
             </h3>
           </div>
@@ -291,7 +291,7 @@ export function ToolExamples({
             className="rounded-xl border border-[var(--line)] px-4 py-3 transition hover:border-[var(--line-strong)] hover:bg-[var(--surface-raised)]"
           >
             <span className="block text-sm font-semibold">
-              Scroll to latest tickets
+              Scroll to latest tasks
             </span>
             <span className="mt-1 block font-mono text-[0.58rem] uppercase tracking-[0.12em] text-[var(--muted)]">
               scroll_to
@@ -317,7 +317,7 @@ export function ToolExamples({
             className="rounded-xl border border-[var(--line)] px-4 py-3 transition hover:border-[var(--line-strong)] hover:bg-[var(--surface-raised)]"
           >
             <span className="block text-sm font-semibold">
-              Open the refund row
+              Open the audit mismatch row
             </span>
             <span className="mt-1 block font-mono text-[0.58rem] uppercase tracking-[0.12em] text-[var(--muted)]">
               click

@@ -22,7 +22,7 @@ describe("demo ticket store", () => {
 
     tickets[0].subject = "Changed outside the store";
     expect(getDemoTicket(4_812)?.subject).toBe(
-      "Revenue filter resets after navigation",
+      "Verify parking garage structural integrity and Phase I environmental report",
     );
   });
 

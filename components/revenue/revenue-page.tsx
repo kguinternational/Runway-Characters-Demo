@@ -18,26 +18,26 @@ import { formatCurrency, formatShortDate } from "@/lib/utils";
 export function RevenuePage() {
   const { range, setRange, openPanel } = useDashboard();
   const revenue = getDemoRevenue(range);
-  const revenueInsight = `${formatCurrency(revenue.total)} total at ${formatCurrency(revenue.dailyAverage)} per day, ${revenue.changePct}% versus the previous comparable period. ${
+  const revenueInsight = `${formatCurrency(revenue.total)} total base rent at ${formatCurrency(revenue.dailyAverage)} per day, ${revenue.changePct}% versus the previous period. ${
     revenue.peakDay
-      ? `The peak was ${formatCurrency(revenue.peakDay.amount)} on ${formatShortDate(revenue.peakDay.date)}.`
+      ? `The peak day was ${formatCurrency(revenue.peakDay.amount)} on ${formatShortDate(revenue.peakDay.date)}.`
       : "No peak day is available."
   } ${revenue.refundCount} ${
-    revenue.refundCount === 1 ? "refund was" : "refunds were"
+    revenue.refundCount === 1 ? "rent variance was" : "rent variances were"
   } flagged. ${
     revenue.dip
-      ? `The largest was ${formatCurrency(revenue.dip.amount)} on ${formatShortDate(revenue.dip.date)}.`
-      : "No refund anomaly is visible in this range."
+      ? `The largest was a variance of ${formatCurrency(revenue.dip.amount)} on ${formatShortDate(revenue.dip.date)}.`
+      : "No rent roll variance is visible in this range."
   }`;
 
   function exportCsv() {
-    const rows = ["date,amount,refunded", ...revenue.series.map((row) =>
+    const rows = ["date,amount,variance", ...revenue.series.map((row) =>
       `${row.date},${row.amount},${Boolean(row.refunded)}`,
     )];
     const url = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = `northstar-revenue-${range}.csv`;
+    link.download = `forum-collections-${range}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -45,9 +45,9 @@ export function RevenuePage() {
   return (
     <div id="revenue-page" data-avatar-target="revenue-page">
       <PageHeader
-        eyebrow="Revenue intelligence"
-        title="Find what changed."
-        description="Change the range, inspect the refund, or export the same demo rows Nova reads."
+        eyebrow="Rent Roll & Pro Forma"
+        title="Analyze in-place cash flow."
+        description="Change the range, inspect the rent roll audit mismatch, or export the financial projections."
       />
 
       <section
@@ -57,7 +57,7 @@ export function RevenuePage() {
       >
         <Card className="p-5">
           <p className="font-mono text-[0.63rem] uppercase tracking-[0.16em] text-[var(--muted)]">
-            Selected total
+            Audited Rent Roll Total
           </p>
           <p className="mt-3 text-2xl font-semibold">
             {formatCurrency(revenue.total)}
@@ -70,12 +70,12 @@ export function RevenuePage() {
           onClick={() =>
             openPanel({
               title: "Period comparison",
-              body: `${range} revenue is ${revenue.changePct}% versus the previous comparable period.`,
+              body: `${range} collections are ${revenue.changePct}% versus the previous comparable period.`,
             })
           }
         >
           <GitCompareArrows className="size-4 text-[var(--muted)]" />
-          <p className="mt-3 text-sm font-semibold">Compare periods</p>
+          <p className="mt-3 text-sm font-semibold">Compare Pro Forma</p>
         </button>
         <button
           id="revenue-export"
@@ -84,7 +84,7 @@ export function RevenuePage() {
           onClick={exportCsv}
         >
           <ArrowDownToLine className="size-4 text-[var(--muted)]" />
-          <p className="mt-3 text-sm font-semibold">Export visible rows</p>
+          <p className="mt-3 text-sm font-semibold">Export projections</p>
         </button>
       </section>
 
@@ -94,10 +94,10 @@ export function RevenuePage() {
         data={revenue}
         onOpenAnomaly={() =>
           openPanel({
-            title: "Refund anomaly",
+            title: "Rent Roll Audit Variance",
             body: revenue?.dip
-              ? `${formatCurrency(revenue.dip.amount)} was marked as a refund on ${formatShortDate(revenue.dip.date)}.`
-              : "No refund anomaly is visible in this range.",
+              ? `The $18,823/month rent roll sum discrepancy was identified as active but omitted in Excel's calculations on ${formatShortDate(revenue.dip.date)}.`
+              : "No audit variance is visible in this range.",
           })
         }
       />
@@ -109,13 +109,13 @@ export function RevenuePage() {
           variant="accent"
           onClick={() =>
             openPanel({
-              title: `${range} revenue insight`,
+              title: `${range} pro forma insight`,
               body: revenueInsight,
             })
           }
         >
           <Sparkles className="size-4" />
-          Revenue insight
+          Financial insight
         </Button>
         <Button
           id="revenue-explain"
@@ -124,12 +124,12 @@ export function RevenuePage() {
           onClick={() =>
             openPanel({
               title: "How this is calculated",
-              body: "The total sums the bundled daily demo rows. Negative refund rows remain visible.",
+              body: "The total sums the audited daily collections of the Forum Buildings. The monthly rent roll summation mismatch is flagged on the 14th day of the cycle.",
             })
           }
         >
           <ReceiptText className="size-4" />
-          Calculation details
+          Audit details
         </Button>
       </div>
     </div>

@@ -20,7 +20,7 @@ export function NewTicketDialog({
   }) => Promise<TicketRecord>;
   onCreated: (ticket: TicketRecord) => void;
 }) {
-  const [subject, setSubject] = useState("Investigate refund in the 30-day revenue report");
+  const [subject, setSubject] = useState("Verify rent roll lease summaries against physical spaces");
   const [team, setTeam] = useState<TicketTeam>("Billing");
   const [saving, setSaving] = useState(false);
 
@@ -51,9 +51,9 @@ export function NewTicketDialog({
         <div className="flex items-center justify-between">
           <div>
             <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--muted)]">
-              Local demo ticket
+              Due Diligence
             </p>
-            <h2 className="mt-2 text-2xl font-semibold">Create a ticket</h2>
+            <h2 className="mt-2 text-2xl font-semibold">Add due diligence task</h2>
           </div>
           <Button
             id="close-new-ticket"
@@ -62,7 +62,7 @@ export function NewTicketDialog({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label="Close new ticket form"
+            aria-label="Close new task form"
           >
             <X className="size-4" />
           </Button>
@@ -79,7 +79,7 @@ export function NewTicketDialog({
           />
         </label>
         <label className="mt-4 block text-sm font-semibold">
-          Team
+          Department
           <select
             id="ticket-team"
             data-avatar-target="ticket-team"
@@ -87,9 +87,9 @@ export function NewTicketDialog({
             onChange={(event) => setTeam(event.target.value as TicketTeam)}
             className="mt-2 w-full rounded-xl border border-[var(--line)] bg-[var(--surface-raised)] px-4 py-3 font-normal outline-none"
           >
-            <option>Billing</option>
-            <option>Support</option>
-            <option>Product</option>
+            <option value="Billing">Financial</option>
+            <option value="Support">Legal</option>
+            <option value="Product">Physical</option>
           </select>
         </label>
         <Button
@@ -101,7 +101,7 @@ export function NewTicketDialog({
           disabled={saving}
         >
           {saving ? <LoaderCircle className="size-4 animate-spin" /> : null}
-          Create demo ticket
+          Create task
         </Button>
       </form>
     </div>

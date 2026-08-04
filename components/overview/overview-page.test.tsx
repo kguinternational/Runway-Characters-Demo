@@ -70,16 +70,16 @@ describe("Overview tool examples", () => {
     }
 
     expect(
-      screen.getByRole("link", { name: /show the last 7 days/i }),
+      screen.getByRole("link", { name: /show 30 days of collections/i }),
     ).toHaveAttribute("href", "/revenue#revenue-chart");
     expect(
-      screen.getByRole("link", { name: /show only billing tickets/i }),
+      screen.getByRole("link", { name: /show only financial tasks/i }),
     ).toHaveAttribute("href", "/tickets#tickets-actions");
     expect(
-      screen.getByRole("link", { name: /create a billing ticket/i }),
+      screen.getByRole("link", { name: /add a financial task/i }),
     ).toHaveAttribute("href", "/tickets#new-ticket");
     expect(
-      screen.getByRole("link", { name: /close ticket #4803/i }),
+      screen.getByRole("link", { name: /resolve task #4803/i }),
     ).toHaveAttribute("href", "/tickets#ticket-status-4803");
   });
 
@@ -87,19 +87,19 @@ describe("Overview tool examples", () => {
     render(<OverviewPage />);
 
     fireEvent.click(
-      screen.getByRole("button", { name: /open the refund detail/i }),
+      screen.getByRole("button", { name: /open the rent roll audit details/i }),
     );
     expect(openPanel).toHaveBeenLastCalledWith({
-      title: "Refund dip",
-      body: `${formatCurrency(revenue.dip!.amount)} is marked as a refund in the 30-day revenue view.`,
+      title: "Rent Roll Mismatch",
+      body: `A rent roll summation variance of ${formatCurrency(revenue.dip!.amount)} is flagged in the monthly pro forma view.`,
     });
 
     fireEvent.click(
-      screen.getByRole("button", { name: /give me the dashboard brief/i }),
+      screen.getByRole("button", { name: /give me the deal summary brief/i }),
     );
     expect(openPanel).toHaveBeenLastCalledWith({
-      title: "Overview insight",
-      body: `${formatCurrency(revenue.total)} in 30-day revenue, ${revenue.changePct}% versus the previous period, ${revenue.refundCount} refund flags, and ${ticketInsights.open} open tickets. ${ticketInsights.topTeam!.team} owns the largest queue with ${ticketInsights.topTeam!.count}.`,
+      title: "Acquisition Overview",
+      body: `${formatCurrency(revenue.total)} in monthly base rent, ${revenue.changePct}% versus the previous period, ${revenue.refundCount} audit variance flags, and ${ticketInsights.open} active due diligence tasks. The Physical department has the largest workload with ${ticketInsights.topTeam!.count} tasks.`,
     });
   });
 });

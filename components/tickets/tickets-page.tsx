@@ -32,9 +32,9 @@ export function TicketsPage() {
     if (ticketFilter === "billing") return ticket.team === "Billing";
     return true;
   });
-  const queueInsight = `${ticketInsights.open} open and ${ticketInsights.closed} closed across ${ticketInsights.total} tickets.${
+  const queueInsight = `${ticketInsights.open} active and ${ticketInsights.closed} resolved across ${ticketInsights.total} tasks.${
     ticketInsights.topTeam
-      ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
+      ? ` ${ticketInsights.topTeam.team === "Billing" ? "Financial" : ticketInsights.topTeam.team === "Support" ? "Legal" : "Physical"} owns the largest list with ${ticketInsights.topTeam.count}.`
       : ""
   }${
     ticketInsights.latestTicket
@@ -45,9 +45,9 @@ export function TicketsPage() {
   return (
     <div id="tickets-page" data-avatar-target="tickets-page">
       <PageHeader
-        eyebrow="Customer support"
-        title="Work the queue."
-        description="Filter, inspect, and update the same local demo tickets available to Nova."
+        eyebrow="Acquisition Due Diligence"
+        title="Reconcile the checklist."
+        description="Filter, inspect, and update the transaction tasks available to Nova."
       />
 
       <section
@@ -70,7 +70,7 @@ export function TicketsPage() {
               )}
               onClick={() => setTicketFilter(value)}
             >
-              {value}
+              {value === "billing" ? "financial" : value === "open" ? "active" : value}
             </button>
           ))}
         </div>
@@ -81,13 +81,13 @@ export function TicketsPage() {
             variant="outline"
             onClick={() =>
               openPanel({
-                title: "Ticket queue insight",
+                title: "Due Diligence Checklist Insight",
                 body: queueInsight,
               })
             }
           >
             <Sparkles className="size-4" />
-            Queue insight
+            Checklist insight
           </Button>
           <Button
             id="ticket-filter-help"
@@ -95,8 +95,8 @@ export function TicketsPage() {
             variant="outline"
             onClick={() =>
               openPanel({
-                title: "Queue filters",
-                body: "All shows every ticket, Open shows active work, and Billing narrows the owning team.",
+                title: "Checklist filters",
+                body: "All shows every task, Active shows outstanding items, and Financial narrows the list to accounting and audit items.",
               })
             }
           >
@@ -110,8 +110,8 @@ export function TicketsPage() {
             onClick={async () => {
               await refreshTickets();
               openPanel({
-                title: "Ticket queue refreshed",
-                body: "The visible queue now matches the shared local demo store.",
+                title: "Checklist refreshed",
+                body: "The visible task queue now matches the central transaction database.",
               });
             }}
           >
@@ -125,7 +125,7 @@ export function TicketsPage() {
             onClick={() => setDialogOpen(true)}
           >
             <Plus className="size-4" />
-            New ticket
+            New task
           </Button>
         </div>
       </section>
@@ -134,16 +134,16 @@ export function TicketsPage() {
         tickets={filteredTickets}
         onTicketClick={(ticket) =>
           openPanel({
-            title: `Ticket #${ticket.ticketId}`,
-            body: `${ticket.subject} is ${ticket.status} and owned by ${ticket.team}.`,
+            title: `Task #${ticket.ticketId}`,
+            body: `${ticket.subject} is ${ticket.status} and assigned to ${ticket.team === "Billing" ? "Financial" : ticket.team === "Support" ? "Legal" : "Physical"}.`,
           })
         }
         onStatusChange={async (ticket) => {
           const status = ticket.status === "open" ? "closed" : "open";
           await updateTicketStatus({ ticketId: ticket.ticketId, status });
           openPanel({
-            title: `Ticket #${ticket.ticketId} updated`,
-            body: `${ticket.subject} is now ${status}.`,
+            title: `Task #${ticket.ticketId} updated`,
+            body: `${ticket.subject} status is now ${status === "open" ? "active" : "resolved"}.`,
           });
         }}
       />
@@ -154,8 +154,8 @@ export function TicketsPage() {
         onCreate={createTicket}
         onCreated={(ticket) =>
           openPanel({
-            title: `Ticket #${ticket.ticketId} created`,
-            body: `${ticket.subject} is open and assigned to ${ticket.team}.`,
+            title: `Task #${ticket.ticketId} created`,
+            body: `${ticket.subject} is active and assigned to ${ticket.team === "Billing" ? "Financial" : ticket.team === "Support" ? "Legal" : "Physical"}.`,
           })
         }
       />

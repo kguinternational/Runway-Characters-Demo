@@ -16,21 +16,21 @@ export function OverviewPage() {
   const { openPanel, tickets, ticketInsights } = useDashboard();
   const revenue = getDemoRevenue("30d");
   const recentTickets = tickets.slice(0, 4);
-  const overviewInsight = `${formatCurrency(revenue.total)} in 30-day revenue, ${revenue.changePct}% versus the previous period, ${revenue.refundCount} refund flags, and ${ticketInsights.open} open tickets.${
+  const overviewInsight = `${formatCurrency(revenue.total)} in monthly base rent, ${revenue.changePct}% versus the previous period, ${revenue.refundCount} audit variance flags, and ${ticketInsights.open} active due diligence tasks.${
     ticketInsights.topTeam
-      ? ` ${ticketInsights.topTeam.team} owns the largest queue with ${ticketInsights.topTeam.count}.`
+      ? ` The ${ticketInsights.topTeam.team === "Billing" ? "Financial" : ticketInsights.topTeam.team === "Support" ? "Legal" : "Physical"} department has the largest workload with ${ticketInsights.topTeam.count} tasks.`
       : ""
   }`;
   const refundInsight = revenue.dip
-    ? `${formatCurrency(revenue.dip.amount)} is marked as a refund in the 30-day revenue view.`
-    : "No refund anomaly is visible in the current 30-day data.";
+    ? `A rent roll summation variance of ${formatCurrency(revenue.dip.amount)} is flagged in the monthly pro forma view.`
+    : "No audit variance is visible in the current monthly projections.";
 
   return (
     <div id="overview-page" data-avatar-target="overview-page">
       <PageHeader
-        eyebrow="Live operations · Dubai"
-        title="Your support signal."
-        description="Open any card yourself, or ask Nova to navigate and take the same actions."
+        eyebrow="Acquisition Command Center · West Palm Beach"
+        title="Forum Buildings Deal Room."
+        description="Open any card yourself, or ask Nova to navigate and explain the acquisition metrics."
       />
 
       <section
@@ -40,49 +40,49 @@ export function OverviewPage() {
       >
         <MetricCard
           id="metric-revenue"
-          eyebrow="30-day revenue"
+          eyebrow="Monthly Base Rent"
           value={formatCurrency(revenue.total)}
-          detail={`${revenue.changePct}% vs previous period`}
+          detail="Stated $430k vs Audited $449k"
           icon={CreditCard}
           trend={revenue.changePct < 0 ? "down" : "up"}
           onClick={() =>
             openPanel({
-              title: "Revenue snapshot",
-              body: `${formatCurrency(revenue.total)} over 30 days, ${revenue.changePct}% versus the previous period.`,
+              title: "Base Rent Reconciliation",
+              body: `Audited occupied base rent of ${formatCurrency(revenue.total)} (annualized $5.39M) reflects the actual sum of active leases, uncovering a +$18,823/month under-reporting mismatch.`,
             })
           }
         />
         <MetricCard
           id="metric-refunds"
-          eyebrow="Refunds flagged"
+          eyebrow="Audit Surpluses"
           value={String(revenue.refundCount)}
-          detail="Marked in the bundled demo rows"
+          detail="11,336 sqft & $18.8k/mo missing"
           icon={BadgeAlert}
-          trend={revenue.refundCount ? "down" : "neutral"}
+          trend={revenue.refundCount ? "up" : "neutral"}
           onClick={() =>
             openPanel({
-              title: "Refund flags",
-              body: `${revenue.refundCount} refund rows are marked in the current 30-day period.`,
+              title: "Rent Roll Audit Discrepancies",
+              body: `The seller's sheet omitted crucial 10th-floor, fiber, and parking leases from the summation formulas, creating a +11,336 sqft and +$18.8k/month gap that works to our favor.`,
             })
           }
         />
         <MetricCard
           id="metric-tickets"
-          eyebrow="Tickets open"
+          eyebrow="Active Due Diligence"
           value={String(ticketInsights.open)}
-          detail="Shared local demo queue"
+          detail="Checklist of critical tasks"
           icon={TicketCheck}
           trend="neutral"
           onClick={() =>
             openPanel({
-              title: "Support queue",
-              body: `${ticketInsights.open} tickets are currently open. Visit Tickets to inspect or create one.`,
+              title: "Due Diligence Checklist",
+              body: `${ticketInsights.open} active checklist items remaining across Legal, Financial, and Physical categories.`,
             })
           }
           className="sm:col-span-2 xl:col-span-1"
         />
       </section>
-
+ 
       <ToolExamples
         overviewInsight={overviewInsight}
         refundInsight={refundInsight}
@@ -98,7 +98,7 @@ export function OverviewPage() {
             <p className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-[var(--muted)]">
               Recent activity
             </p>
-            <h2 className="mt-2 text-xl font-semibold">Latest tickets</h2>
+            <h2 className="mt-2 text-xl font-semibold">Latest tasks</h2>
           </div>
           <Link
             id="overview-view-tickets"

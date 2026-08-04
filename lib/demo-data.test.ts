@@ -16,8 +16,8 @@ describe("demo revenue", () => {
     const result = getDemoRevenue("90d");
 
     expect(result.series).toHaveLength(90);
-    expect(result.total).toBe(349_783);
-    expect(result.dailyAverage).toBe(3_886.48);
+    expect(result.total).toBe(1_324_244);
+    expect(result.dailyAverage).toBe(14_713.82);
   });
 
   it("compares each range with the preceding equally sized period", () => {
@@ -32,7 +32,7 @@ describe("demo revenue", () => {
 
     expect(result.dip).toEqual({
       date: "2026-07-10",
-      amount: -2_850,
+      amount: -18_823,
       refunded: true,
     });
     expect(result.refundCount).toBe(1);
@@ -61,7 +61,7 @@ describe("demo ticket insights", () => {
         ticketId: 4_812,
       },
     });
-    expect(insights.topTeam).toEqual({ team: "Support", count: 3 });
+    expect(insights.topTeam).toEqual({ team: "Product", count: 3 });
     expect(DEMO_TICKETS).toEqual(original);
   });
 

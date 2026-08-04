@@ -23,9 +23,9 @@ export function TicketsTable({
         <table className="w-full min-w-[660px] border-collapse text-left">
           <thead>
             <tr className="border-b border-[var(--line)] font-mono text-[0.64rem] uppercase tracking-[0.14em] text-[var(--muted)]">
-              <th className="px-6 py-3.5 font-medium">Ticket</th>
+              <th className="px-6 py-3.5 font-medium">Task</th>
               <th className="px-4 py-3.5 font-medium">Subject</th>
-              <th className="px-4 py-3.5 font-medium">Team</th>
+              <th className="px-4 py-3.5 font-medium">Department</th>
               <th className="px-6 py-3.5 text-right font-medium">
                 Click status to change
               </th>
@@ -61,15 +61,17 @@ export function TicketsTable({
                 <td className="max-w-[360px] px-4 py-4 font-medium">
                   <span className="line-clamp-1">{ticket.subject}</span>
                 </td>
-                <td className="px-4 py-4 text-[var(--muted)]">{ticket.team}</td>
+                <td className="px-4 py-4 text-[var(--muted)]">
+                  {ticket.team === "Billing" ? "Financial" : ticket.team === "Support" ? "Legal" : "Physical"}
+                </td>
                 <td className="px-6 py-4 text-right">
                   <button
                     id={`ticket-status-${ticket.ticketId}`}
                     data-avatar-target={`ticket-status-${ticket.ticketId}`}
                     type="button"
-                    title={`Mark as ${ticket.status === "open" ? "closed" : "open"}`}
-                    aria-label={`Mark ticket ${ticket.ticketId} ${
-                      ticket.status === "open" ? "closed" : "open"
+                    title={`Mark as ${ticket.status === "open" ? "resolved" : "active"}`}
+                    aria-label={`Mark task ${ticket.ticketId} ${
+                      ticket.status === "open" ? "resolved" : "active"
                     }`}
                     className="rounded-full transition hover:opacity-70"
                     onClick={(event) => {
@@ -85,7 +87,7 @@ export function TicketsTable({
                       ) : (
                         <CircleCheck className="size-3" />
                       )}
-                      {ticket.status}
+                      {ticket.status === "open" ? "active" : "resolved"}
                     </StatusPill>
                   </button>
                 </td>

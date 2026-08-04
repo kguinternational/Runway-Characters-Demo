@@ -127,7 +127,7 @@ describe("createAvatarSession", () => {
       support: {
         total: 10,
         open: 7,
-        topTeam: { team: "Support", count: 3 },
+        topTeam: { team: "Product", count: 3 },
         latestTicket: { ticketId: 4_812 },
       },
     });
@@ -147,16 +147,16 @@ describe("createAvatarSession", () => {
       total: 10,
       open: 7,
       closed: 3,
-      topTeam: { team: "Support", count: 3 },
+      topTeam: { team: "Product", count: 3 },
       latestTicket: { ticketId: 4_812 },
     });
     await expect(
-      rpcOptions!.tools.get_ticket({ ticketId: 4_806 }),
+      rpcOptions!.tools.get_ticket({ ticketId: 4806 }),
     ).resolves.toMatchObject({
       ticket: {
-        ticketId: 4_806,
-        subject: "Password reset link expires immediately",
-        team: "Support",
+        ticketId: 4806,
+        subject: "Verify Kelley Fulton lease terms for Suite 1010 ($1,888.13/mo under-reported)",
+        team: "Billing",
         status: "closed",
       },
     });

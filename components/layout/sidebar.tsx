@@ -17,8 +17,8 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/", label: "Overview", icon: BarChart3, target: "overview" },
-  { href: "/revenue", label: "Revenue", icon: ChartNoAxesCombined, target: "revenue" },
-  { href: "/tickets", label: "Tickets", icon: TicketCheck, target: "tickets" },
+  { href: "/revenue", label: "Pro Forma", icon: ChartNoAxesCombined, target: "revenue" },
+  { href: "/tickets", label: "Due Diligence", icon: TicketCheck, target: "tickets" },
   { href: "/settings", label: "Settings", icon: Settings2, target: "settings" },
 ];
 
@@ -34,14 +34,14 @@ export function Sidebar() {
         </span>
         <span>
           <span className="block text-[1.05rem] font-semibold leading-none tracking-[-0.04em]">
-            Northstar
+            KGU Forum
           </span>
           <span className="mt-1 block font-mono text-[0.56rem] uppercase tracking-[0.15em] text-white/38">
-            Signal room
+            Deal room
           </span>
         </span>
       </Link>
-
+      
       <nav className="space-y-1 px-3 py-5" aria-label="Primary navigation">
         {items.map((item) => {
           const active = pathname === item.href;
@@ -71,7 +71,7 @@ export function Sidebar() {
           <Sparkles className="size-4 text-[var(--accent)]" />
           <p className="mt-3 text-sm font-semibold">Nova is on call</p>
           <p className="mt-1 text-xs leading-5 text-white/42">
-            Navigate, act, and inspect demo data.
+            Ask Nova about pro forma, lease details, and digital twin metrics.
           </p>
         </div>
         <button
@@ -80,13 +80,13 @@ export function Sidebar() {
           className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/45 transition hover:bg-white/5 hover:text-white/75"
           onClick={() =>
             openPanel({
-              title: "Two-minute demo",
-              body: "Ask Nova to show 30-day revenue, explain the refund dip, create a Billing ticket, then switch to dark mode.",
+              title: "Acquisition Guide",
+              body: "Ask Nova to summarize the deal, explain the rent roll audit mismatch, check on the MLO option status, and run digital twin diagnostics.",
             })
           }
         >
           <CircleHelp className="size-4" />
-          Demo guide
+          Deal guide
         </button>
       </div>
     </aside>
