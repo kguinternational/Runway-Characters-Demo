@@ -88,7 +88,7 @@ describe("createAvatarSession", () => {
     expect(mocks.create).toHaveBeenCalledWith(
       expect.objectContaining({
         model: "gwm1_avatars",
-        avatar: { type: "custom", avatarId: NOVA_AVATAR_ID },
+        avatar: { type: "runway-preset", presetId: "human-resource" },
         personality: expect.stringContaining(
           "Client tools and Page Actions — order matters",
         ),

@@ -30,7 +30,7 @@ export async function createAvatarSession() {
   const apiKey = process.env.RUNWAYML_API_SECRET!;
   const { id: sessionId } = await runway.realtimeSessions.create({
     model: "gwm1_avatars",
-    avatar: { type: "custom", avatarId: NOVA_AVATAR_ID },
+    avatar: { type: "runway-preset", presetId: "human-resource" },
     personality: NOVA_PERSONALITY,
     startScript: NOVA_START_SCRIPT,
     tools: sessionTools,
