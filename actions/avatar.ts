@@ -24,11 +24,25 @@ import type {
 } from "@/lib/types";
 
 const handlers = new Map<string, RpcHandler>();
-const runway = new Runway();
+let runwayClient: Runway | null = null;
+
+function getRunwayClient() {
+  if (!runwayClient) {
+    const apiKey = process.env.RUNWAYML_API_SECRET;
+    if (!apiKey) {
+      throw new Error(
+        "Runway API Key is missing. Please add RUNWAYML_API_SECRET to your .env.local file to connect the live video agent."
+      );
+    }
+    runwayClient = new Runway({ apiKey });
+  }
+  return runwayClient;
+}
 
 export async function createAvatarSession() {
   const apiKey = process.env.RUNWAYML_API_SECRET!;
-  const { id: sessionId } = await runway.realtimeSessions.create({
+  const client = getRunwayClient();
+  const { id: sessionId } = await client.realtimeSessions.create({
     model: "gwm1_avatars",
     avatar: { type: "runway-preset", presetId: "human-resource" },
     personality: NOVA_PERSONALITY,
