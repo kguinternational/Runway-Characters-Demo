@@ -16,7 +16,14 @@ import { useState } from "react";
 import { createAvatarSession } from "@/actions/avatar";
 import { ClientToolHandlers } from "@/components/agent/client-tool-handlers";
 import { Button } from "@/components/ui/button";
-import { NOVA_AVATAR_ID, NOVA_IMAGE } from "@/lib/avatar";
+import { useState } from "react";
+import { NOVA_AVATAR_ID, NOVA_IMAGE, WYATT_IMAGE, WYATT_NAME } from "@/lib/avatar";
+
+// Inside component:
+// Support switching between Nova & Wyatt photo avatar
+const [activeAvatar, setActiveAvatar] = useState<"nova" | "wyatt">("wyatt");
+const avatarImage = activeAvatar === "wyatt" ? WYATT_IMAGE : NOVA_IMAGE;
+const avatarName = activeAvatar === "wyatt" ? WYATT_NAME : "Nova";
 import { cn } from "@/lib/utils";
 
 export function AgentCard({
@@ -123,19 +130,27 @@ export function AgentCard({
             <div className="flex min-h-full flex-col justify-center p-6">
               <div className="flex items-center gap-4">
                 <Image
-                  src={NOVA_IMAGE}
-                  alt="Nova, Northstar customer support"
+                  src={avatarImage}
+                  alt={`${avatarName}, Runway character`}
                   width={72}
                   height={72}
-                  className="size-[72px] rounded-2xl object-cover object-top"
+                  className="size-[72px] rounded-2xl object-cover object-top border border-cyan-500/30"
                   preload
                 />
                 <div>
-                  <p className="font-mono text-[0.61rem] uppercase tracking-[0.16em] text-white/42">
-                    Runway Character
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-mono text-[0.61rem] uppercase tracking-[0.16em] text-white/42">
+                      Runway Character: <span className="text-cyan-400 font-bold">{avatarName}</span>
+                    </p>
+                    <button 
+                      onClick={() => setActiveAvatar(activeAvatar === "wyatt" ? "nova" : "wyatt")}
+                      className="text-[0.6rem] px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-white/80"
+                    >
+                      Switch to {activeAvatar === "wyatt" ? "Nova" : "Wyatt"}
+                    </button>
+                  </div>
                   <h2 className="mt-1 text-2xl font-semibold tracking-[-0.05em]">
-                    How can I help?
+                    How can {avatarName} help?
                   </h2>
                 </div>
               </div>

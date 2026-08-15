@@ -1,5 +1,7 @@
 export const NOVA_AVATAR_ID = "65ceecb3-704e-4923-8a6e-e82814287af2";
 export const NOVA_IMAGE = "/nova-support.png";
+export const WYATT_IMAGE = "/wyatt.png";
+export const WYATT_NAME = "Wyatt";
 export const NOVA_START_SCRIPT =
   "Hi, I’m Nova. I can explore the Forum Buildings acquisition metrics, explain our rent roll audit findings, and walk you through our due diligence checklist. Share your screen to review lease documents or the 3D digital twin.";
 
